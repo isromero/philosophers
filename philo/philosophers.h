@@ -15,7 +15,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <pthread.h>
+#include <sys/time.h>
 
 typedef struct	s_data {
 	int	n_philo;
@@ -24,6 +26,8 @@ typedef struct	s_data {
 	int	time_eat;
 	int	time_sleep;
 	int	time_think;
+	unsigned long long	current_time;
+	int	n_meals;
 	pthread_mutex_t	left_fork;
 	pthread_mutex_t	right_fork;
 }	t_data;
@@ -33,9 +37,10 @@ void	*routine(void *philo_data);
 
 /* actions.c */
 void	take_forks(t_data *philo);
+void	eat(t_data *philo);
 
 /* utils */
 int		ft_atoi(const char *str);
-void	init_data(t_data *data);
+unsigned long long	get_time(void);
 
 #endif

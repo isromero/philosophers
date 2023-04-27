@@ -12,14 +12,19 @@
 
 #include "philosophers.h"
 
-void	init_data(t_data *data)
+unsigned long long	get_time(void)
 {
-	data->n_philo = 1;
-	data->id = 1;
-	data->time_die = 0;
-	data->time_eat = 0;
-	data->time_sleep = 0;
-	data->time_think = 0;
+	unsigned long long	time_in_ms;
+	struct timeval		current_time;
+
+	time_in_ms = 0;
+	if (gettimeofday(&current_time, NULL) == -1)
+	{
+		printf("Error getting time of day\n");
+		exit(1);
+	}
+	time_in_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
+	return (time_in_ms);
 }
 
 int	ft_atoi(const char *str)

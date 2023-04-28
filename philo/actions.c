@@ -44,3 +44,13 @@ void	eat(t_philo *philo)
 	pthread_mutex_unlock(philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
 }
+
+void	sleep_and_think(t_philo *philo)
+{
+    philo->data->current_time = get_time();
+	printf("%llu %d is sleeping\n", philo->data->current_time, philo->id);
+	usleep(philo->data->time_sleep * 1000);
+
+    philo->data->current_time = get_time();
+    printf("%llu %d is thinking\n", philo->data->current_time, philo->id);
+}

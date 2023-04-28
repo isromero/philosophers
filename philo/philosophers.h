@@ -45,6 +45,7 @@ void	*routine(void *philo_data);
 /* actions.c */
 void	take_forks(t_philo *philo);
 void	eat(t_philo *philo);
+void	sleep_and_think(t_philo *philo);
 
 /* utils */
 int		ft_atoi(const char *str);

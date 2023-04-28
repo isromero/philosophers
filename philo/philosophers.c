@@ -22,8 +22,7 @@ void	*routine(void *philo_data)
 	{
 		take_forks(philo);
 		eat(philo);
-		/* sleep(philo); */
-		/* think(philo); */
+		sleep_and_think(philo);
 	}
 }
 

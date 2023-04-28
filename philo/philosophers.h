@@ -19,25 +19,32 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-typedef struct	s_data {
+typedef struct	s_data
+{
 	int	n_philo;
-	int	id;
 	int	time_die;
 	int	time_eat;
 	int	time_sleep;
 	int	time_think;
+	unsigned long long	start_time;
 	unsigned long long	current_time;
 	int	n_meals;
-	pthread_mutex_t	left_fork;
-	pthread_mutex_t	right_fork;
 }	t_data;
+
+typedef struct	s_philo
+{
+	int	id;
+	pthread_mutex_t	*left_fork;
+	pthread_mutex_t	*right_fork;
+	t_data	*data;
+} t_philo;
 
 /* philosophers.c */
 void	*routine(void *philo_data);
 
 /* actions.c */
-void	take_forks(t_data *philo);
-void	eat(t_data *philo);
+void	take_forks(t_philo *philo);
+void	eat(t_philo *philo);
 
 /* utils */
 int		ft_atoi(const char *str);

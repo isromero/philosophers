@@ -21,7 +21,7 @@ unsigned long long	get_time(void)
 	if (gettimeofday(&current_time, NULL) == -1)
 	{
 		printf("Error getting time of day\n");
-		exit(1);
+		return(1); //can't use exit
 	}
 	time_in_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
 	return (time_in_ms);

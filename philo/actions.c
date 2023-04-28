@@ -12,33 +12,35 @@
 
 #include "philosophers.h"
 
-void	take_forks(t_data *philo)
+void	take_forks(t_philo *philo)
 {
+    philo->data->current_time = get_time();
 	printf("[%d] is trying to take forks\n", philo->id);
 
 	//lock the left fork
-	if (pthread_mutex_lock(&philo->left_fork) == -1) 
+	if (pthread_mutex_lock(philo->left_fork) == -1) 
 	{
         printf("[%d] failed to take left fork\n", philo->id);
         return ;
     }
-    printf("[%d] took left fork\n", philo->id);
+    printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
 
 	//lock the right fork
-    if (pthread_mutex_lock(&philo->right_fork) == -1) 
+    if (pthread_mutex_lock(philo->right_fork) == -1) 
 	{
         //failed to lock right fork, release the left fork and return
-        pthread_mutex_unlock(&philo->left_fork);
+        pthread_mutex_unlock(philo->left_fork);
         printf("[%d] failed to take right fork\n", philo->id);
         return ;
     }
-    printf("[%d] took right fork\n", philo->id);
+    printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
 }
 
-void	eat(t_data *philo)
+void	eat(t_philo *philo)
 {
-	printf("%llu %d is eating\n", philo->current_time, philo->id);
-	usleep(philo->time_eat * 1000);
-	pthread_mutex_unlock(&philo->left_fork);
-	pthread_mutex_unlock(&philo->right_fork);
+    philo->data->current_time = get_time();
+	printf("%llu %d is eating\n", philo->data->current_time, philo->id);
+	usleep(philo->data->time_eat * 1000);
+	pthread_mutex_unlock(philo->left_fork);
+	pthread_mutex_unlock(philo->right_fork);
 }

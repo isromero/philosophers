@@ -15,7 +15,7 @@
 void	take_forks(t_philo *philo)
 {
     philo->data->current_time = get_time();
-	printf("[%d] is trying to take forks\n", philo->id);
+	/* printf("[%d] is trying to take forks\n", philo->id); */
 
 	//lock the left fork
 	if (pthread_mutex_lock(philo->left_fork) == -1) 

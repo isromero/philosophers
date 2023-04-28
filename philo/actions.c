@@ -23,7 +23,7 @@ void	take_forks(t_philo *philo)
         printf("[%d] failed to take left fork\n", philo->id);
         return ;
     }
-    printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
+    printf("%llums %d has taken a fork\n", philo->data->current_time, philo->id);
 
 	//lock the right fork
     if (pthread_mutex_lock(philo->right_fork) == -1) 
@@ -33,13 +33,13 @@ void	take_forks(t_philo *philo)
         printf("[%d] failed to take right fork\n", philo->id);
         return ;
     }
-    printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
+    printf("%llums %d has taken a fork\n", philo->data->current_time, philo->id);
 }
 
 void	eat(t_philo *philo)
 {
     philo->data->current_time = get_time();
-	printf("%llu %d is eating\n", philo->data->current_time, philo->id);
+	printf("%llums %d is eating\n", philo->data->current_time, philo->id);
 	usleep(philo->data->time_eat * 1000);
 	pthread_mutex_unlock(philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
@@ -47,10 +47,8 @@ void	eat(t_philo *philo)
 
 void	sleep_and_think(t_philo *philo)
 {
-    philo->data->current_time = get_time();
-	printf("%llu %d is sleeping\n", philo->data->current_time, philo->id);
+	printf("%llums %d is sleeping\n", philo->data->current_time, philo->id);
 	usleep(philo->data->time_sleep * 1000);
 
-    philo->data->current_time = get_time();
-    printf("%llu %d is thinking\n", philo->data->current_time, philo->id);
+    printf("%llums %d is thinking\n", philo->data->current_time, philo->id);
 }

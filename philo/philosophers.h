@@ -22,13 +22,16 @@
 typedef struct	s_data
 {
 	int	n_philo;
-	int	time_die;
-	int	time_eat;
-	int	time_sleep;
-	int	time_think;
+	unsigned long long	time_die;
+	unsigned long long	time_eat;
+	unsigned long long	time_sleep;
+	unsigned long long	time_think;
 	unsigned long long	start_time;
 	unsigned long long	current_time;
+	unsigned long long	last_meal_time;
 	int	n_meals;
+	int	sim_stop;
+	int	meals_eaten;
 }	t_data;
 
 typedef struct	s_philo

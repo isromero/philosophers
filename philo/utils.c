@@ -14,17 +14,25 @@
 
 unsigned long long	get_time(void)
 {
-	unsigned long long	time_in_ms;
-	struct timeval		current_time;
+	//we use static because we need the unix time one time, and when we call again get_time is reinitializing
+	static struct timeval		unix_clock;
+	struct timeval				current_time;
 
-	time_in_ms = 0;
-	if (gettimeofday(&current_time, NULL) == -1)
-	{
-		printf("Error getting time of day\n");
-		return(1); //can't use exit
-	}
-	time_in_ms = (current_time.tv_sec * 1000) + (current_time.tv_usec / 1000);
-	return (time_in_ms);
+	//we check if == 0 because needs to be 0 to get the time, and in another calls is not going to reinitializing
+	if (unix_clock.tv_sec == 0 && unix_clock.tv_usec == 0)
+    {
+        if (gettimeofday(&unix_clock, NULL) == -1)
+        {
+            printf("Error getting time of day\n");
+            return (0);
+        }
+    }
+    if (gettimeofday(&current_time, NULL) == -1)
+    {
+        printf("Error getting time of day\n");
+        return (0);
+    }
+	return (((current_time.tv_sec - unix_clock.tv_sec) * 1000) + ((current_time.tv_usec - unix_clock.tv_usec) / 1000));
 }
 
 int	ft_atoi(const char *str)

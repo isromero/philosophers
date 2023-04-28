@@ -18,12 +18,31 @@ void	*routine(void *philo_data)
 
 	//the thread routine, we cast the void*
 	philo = (t_philo *)philo_data;
-	while(1)
+	philo->data->meals_eaten = 0;
+	philo->data->sim_stop = 0;
+	philo->data->last_meal_time = 0;
+	while(!(philo->data->sim_stop == 1))
 	{
+	/* 	if ((get_time() - philo->data->last_meal_time) >= philo->data->time_die)
+		{
+			// el filósofo ha muerto, establecer la variable de fin de simulación
+			philo->data->sim_stop = 1;
+			return 0;
+		} */
+		// si se ha alcanzado el número de comidas, establecer la variable de fin de simulación
+		if (philo->data->n_meals > 0 && philo->data->meals_eaten >= philo->data->n_philo * philo->data->n_meals)
+		{
+			
+			philo->data->sim_stop = 1;
+			return 0;
+		}
 		take_forks(philo);
 		eat(philo);
+		philo->data->meals_eaten++;
+		philo->data->last_meal_time = get_time();
 		sleep_and_think(philo);
 	}
+	return 0;
 }
 
 void	parse_args(int argc, char **argv, t_data *data)
@@ -45,13 +64,13 @@ void	parse_args(int argc, char **argv, t_data *data)
 
 int	main(int argc, char **argv)
 {
+	
 	t_data 		data;
 	t_philo		*philo;
 	pthread_t	*threads;
 	pthread_mutex_t *forks;
 	int	i;
 
-	data.start_time = get_time();
 	parse_args(argc, argv, &data);
 	
 	threads = malloc(sizeof(pthread_t) * data.n_philo);

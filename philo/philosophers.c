@@ -70,7 +70,6 @@ void	parse_args(int argc, char **argv, t_data *data)
 
 int	main(int argc, char **argv)
 {
-	
 	t_data 		data;
 	t_philo		*philo;
 	pthread_t	*threads;

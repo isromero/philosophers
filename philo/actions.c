@@ -14,29 +14,29 @@
 
 
 /* we implement an asymmetric solution, and odd philosophers picks up first his left
-fork and then his right fork, and an evend philosophers picks up first right fork and then
+fork and then his right fork, and an even philosophers picks up first right fork and then
 his left fork, so they can't get in trouble with the order and we protect a data race */
 void	take_forks(t_philo *philo)
 {
    
     /* philo->state = 1; */
     
-	/* printf("[%d] is trying to take forks\n", philo->id); */
+	/* pintf("[%d] is trying to take forks\n", philo->id); */
     if(philo->id % 2 == 1)
     {
-        pthread_mutex_lock(philo->right_fork); 
+        pthread_mutex_lock(philo->left_fork);
         philo->data->current_time = get_time();
         printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
-        pthread_mutex_lock(philo->left_fork);
+        pthread_mutex_lock(philo->right_fork);
         philo->data->current_time = get_time();
         printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
     }
     if(philo->id % 2 == 0)
     {
-        pthread_mutex_lock(philo->left_fork);
+        pthread_mutex_lock(philo->right_fork);
         philo->data->current_time = get_time();
         printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
-        pthread_mutex_lock(philo->right_fork); 
+        pthread_mutex_lock(philo->left_fork); 
         philo->data->current_time = get_time();
         printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
     }

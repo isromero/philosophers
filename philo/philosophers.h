@@ -30,6 +30,7 @@ typedef struct	s_data
 	unsigned long long	start_time;
 	unsigned long long	current_time;
 	unsigned long long	last_meal_time;
+	unsigned long long	last_fork_time;
 	int	n_meals;
 	int	sim_stop;
 	int	meals_eaten;

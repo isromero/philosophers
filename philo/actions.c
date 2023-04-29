@@ -18,9 +18,8 @@ fork and then his right fork, and an even philosophers picks up first right fork
 his left fork, so they can't get in trouble with the order and we protect a data race */
 void	take_forks(t_philo *philo)
 {
-   
     /* philo->state = 1; */
-    
+    philo->data->start_time = get_time();
 	/* pintf("[%d] is trying to take forks\n", philo->id); */
     if(philo->id % 2 == 1)
     {
@@ -29,6 +28,8 @@ void	take_forks(t_philo *philo)
         printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
         pthread_mutex_lock(philo->right_fork);
         philo->data->current_time = get_time();
+        if((philo->data->current_time - philo->data->start_time) >= (philo->data->time_die))
+            return ;
         printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
     }
     if(philo->id % 2 == 0)
@@ -38,6 +39,8 @@ void	take_forks(t_philo *philo)
         printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
         pthread_mutex_lock(philo->left_fork); 
         philo->data->current_time = get_time();
+        if((philo->data->current_time - philo->data->start_time) >= (philo->data->time_die))
+            return ;
         printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
     }
 }
@@ -56,10 +59,12 @@ void	eat(t_philo *philo)
 void	sleep_and_think(t_philo *philo)
 {
     /* philo->state = 3; */
+    philo->data->current_time = get_time();
 	printf("%llu %d is sleeping\n", philo->data->current_time, philo->id);
 	usleep(philo->data->time_sleep * 1000);
 
     /* philo->state = 4; */
+    philo->data->current_time = get_time();
     printf("%llu %d is thinking\n", philo->data->current_time, philo->id);
 
 }

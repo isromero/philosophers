@@ -21,18 +21,19 @@ void	*routine(void *philo_data)
 	philo->data->meals_eaten = 0;
 	philo->data->sim_stop = 0;
 	philo->data->last_meal_time = 0;
+	philo->state = 0;
 	while(!(philo->data->sim_stop == 1))
 	{
 		if(philo->data->n_philo == 1)
 		{
-			printf("%llums %d died\n", get_time(), philo->id);
+			printf("%llu %d died\n", get_time(), philo->id);
 			break ;
 		}
 		if ((get_time() - philo->data->last_meal_time) >= philo->data->time_die)
 		{
 			// el filósofo ha muerto, establecer la variable de fin de simulación
 			philo->data->sim_stop = 1;
-			printf("%llums %d died\n", get_time(), philo->id);
+			printf("%llu %d died\n", get_time(), philo->id);
 			break ;
 		}
 		// si se ha alcanzado el número de comidas, establecer la variable de fin de simulación

@@ -12,43 +12,70 @@
 
 #include "philosophers.h"
 
+
+/* we implement an asymmetric solution, and odd philosophers picks up first his left
+fork and then his right fork, and an evend philosophers picks up first right fork and then
+his left fork, so they can't get in trouble with the order and we protect a data race */
 void	take_forks(t_philo *philo)
 {
-    philo->data->current_time = get_time();
+   
+    /* philo->state = 1; */
+    
 	/* printf("[%d] is trying to take forks\n", philo->id); */
-
-	//lock the left fork
-	if (pthread_mutex_lock(philo->left_fork) == -1) 
-	{
-        printf("[%d] failed to take left fork\n", philo->id);
-        return ;
+    if(philo->id % 2 == 1)
+    {
+        pthread_mutex_lock(philo->right_fork); 
+        philo->data->current_time = get_time();
+        printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
+        pthread_mutex_lock(philo->left_fork);
+        philo->data->current_time = get_time();
+        printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
     }
-    printf("%llums %d has taken a fork\n", philo->data->current_time, philo->id);
-
-	//lock the right fork
-    if (pthread_mutex_lock(philo->right_fork) == -1) 
-	{
-        //failed to lock right fork, release the left fork and return
-        pthread_mutex_unlock(philo->left_fork);
-        printf("[%d] failed to take right fork\n", philo->id);
-        return ;
+    if(philo->id % 2 == 0)
+    {
+        pthread_mutex_lock(philo->left_fork);
+        philo->data->current_time = get_time();
+        printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
+        pthread_mutex_lock(philo->right_fork); 
+        philo->data->current_time = get_time();
+        printf("%llu %d has taken a fork\n", philo->data->current_time, philo->id);
     }
-    printf("%llums %d has taken a fork\n", philo->data->current_time, philo->id);
 }
 
 void	eat(t_philo *philo)
 {
+/*     philo->state = 2; */
     philo->data->current_time = get_time();
-	printf("%llums %d is eating\n", philo->data->current_time, philo->id);
+	printf("%llu %d is eating\n", philo->data->current_time, philo->id);
 	usleep(philo->data->time_eat * 1000);
+
 	pthread_mutex_unlock(philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
 }
 
 void	sleep_and_think(t_philo *philo)
 {
-	printf("%llums %d is sleeping\n", philo->data->current_time, philo->id);
+    /* philo->state = 3; */
+	printf("%llu %d is sleeping\n", philo->data->current_time, philo->id);
 	usleep(philo->data->time_sleep * 1000);
 
-    printf("%llums %d is thinking\n", philo->data->current_time, philo->id);
+    /* philo->state = 4; */
+    printf("%llu %d is thinking\n", philo->data->current_time, philo->id);
+
 }
+
+/* void    waiter(t_philo *philo)
+{
+    while(1)
+    {
+        if(philo->state == 4 || philo->state == 0)
+        {   
+            if(philo->data->available_forks >= 2)
+            {
+                philo->data->available_forks -= 2;
+                break ;
+            }
+        }
+    }
+   
+} */

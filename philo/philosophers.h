@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdbool.h>
 #include <sys/time.h>
 
 typedef struct	s_data
@@ -37,6 +38,7 @@ typedef struct	s_data
 typedef struct	s_philo
 {
 	int	id;
+	int	state;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	t_data	*data;
@@ -49,6 +51,7 @@ void	*routine(void *philo_data);
 void	take_forks(t_philo *philo);
 void	eat(t_philo *philo);
 void	sleep_and_think(t_philo *philo);
+void    waiter(t_philo *philo);
 
 /* utils */
 int		ft_atoi(const char *str);

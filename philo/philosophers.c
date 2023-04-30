@@ -12,6 +12,32 @@
 
 #include "philosophers.h"
 
+void *check_time_to_die(void *arg)
+{
+  t_philo *philo = (t_philo *)arg;
+
+  while (philo->data->sim_stop != 1)
+  {
+    // Obtener el tiempo actual
+    long long current_time = get_time();
+
+    // Comprobar si algún filósofo ha muerto
+    for (int i = 0; i < philo->data->n_philo; i++)
+    {
+      if (philo->state != 2 && (current_time - philo->data->last_meal_time) >= philo->data->time_die)
+      {
+        // El filósofo ha muerto, establecer la variable de fin de simulación
+        philo->data->sim_stop = 1;
+        printf("%llu %d died\n", get_time(), philo->id);
+        return (NULL);
+      }
+    }
+    // Esperar un tiempo corto antes de volver a comprobar
+    usleep(1000);
+  }
+  return (NULL);
+}
+
 void	*routine(void *philo_data)
 {
 	t_philo	*philo;
@@ -24,19 +50,10 @@ void	*routine(void *philo_data)
 	philo->state = 0;
 	while(!(philo->data->sim_stop == 1))
 	{
-
 		if(philo->data->n_philo == 1)
-		{
-			printf("%llu %d died\n", get_time(), philo->id);
 			break ;
-		}
-		if ((get_time() - philo->data->last_meal_time) >= philo->data->time_die)
-		{
-			// el filósofo ha muerto, establecer la variable de fin de simulación
-			philo->data->sim_stop = 1;
-			printf("%llu %d died\n", get_time(), philo->id);
+		if(philo->data->sim_stop == 1)
 			break ;
-		}
 		// si se ha alcanzado el número de comidas, establecer la variable de fin de simulación
 		if (philo->data->n_meals > 0 && philo->data->meals_eaten >= philo->data->n_philo * philo->data->n_meals)
 		{
@@ -44,10 +61,7 @@ void	*routine(void *philo_data)
 			break ;
 		}
 		if(philo->data->forks_available[philo->id - 1] == 0 && philo->data->forks_available[philo->id] == 0)
-		{
 			take_forks(philo);
-			
-		}
 		philo->data->meals_eaten++;
 		philo->data->last_meal_time = get_time();
 		if(philo->state == 2)
@@ -65,7 +79,14 @@ int	parse_args(int argc, char **argv, t_data *data)
 		data->time_eat = ft_atoi(argv[3]);
 		data->time_sleep = ft_atoi(argv[4]);
 		if(argc == 6)
+		{
 			data->n_meals = ft_atoi(argv[5]);
+			if(data->n_meals <= 0)
+			{
+				printf("Invalid arguments\n");
+				return(0);
+			}
+		}
 		if(data->n_philo <= 0 || data->time_die <= 0 || data->time_eat <= 0 || data->time_sleep <= 0)
 		{
 			printf("Invalid arguments\n");
@@ -91,6 +112,7 @@ int	main(int argc, char **argv)
 	philo = malloc(sizeof(t_philo) * data.n_philo);
 	data.forks_available = malloc(sizeof(int) * data.n_philo);
 	memset(data.forks_available, 0, sizeof(int) * data.n_philo);
+	data.start_time = get_time();
 	
 	i = -1;
 	//mutex initialized
@@ -117,6 +139,9 @@ int	main(int argc, char **argv)
 			return (1); //can't use exit
 		}
 	}
+	pthread_t death_check_thread;
+	pthread_create(&death_check_thread, NULL, check_time_to_die, &(philo[0]));
+	pthread_join(death_check_thread, NULL);
 	i = -1;
 	//wait until all threads finished
 	//i is incremented first of all, for start with thread 1

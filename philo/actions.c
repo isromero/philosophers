@@ -12,31 +12,36 @@
 
 #include "philosophers.h"
 
-
 /* we implement an asymmetric solution, and odd philosophers picks up first his left
 fork and then his right fork, and an even philosophers picks up first right fork and then
 his left fork, so they can't get in trouble with the order and we protect a data race */
 
 void take_forks(t_philo *philo)
 {
-	/* philo->state = 1; */
-	philo->data->start_time = get_time();
+	philo->state = 1;
 	/* pintf("[%d] is trying to take forks\n", philo->id); */
 
 	if (philo->id % 2 == 1)
 	{
+		if(philo->data->forks_available[philo->id] == 1)
+		{
+			printf("holaaa\n");
+			return ;
+		}
 		pthread_mutex_lock(philo->left_fork);
-		philo->data->forks_available[philo->id] = 1;
+		philo->data->forks_available[philo->id - 1] = 1;
 		philo->data->current_time = get_time();
 		printf("%lld %d has taken a fork\n", philo->data->current_time, philo->id);
 		pthread_mutex_lock(philo->right_fork);
-		philo->data->forks_available[philo->id + 1] = 1;
+		philo->data->forks_available[philo->id] = 1;
 		philo->data->current_time = get_time();
 		printf("%lld %d has taken a fork\n", philo->data->current_time, philo->id);
 		eat(philo);
 	}
 	if(philo->id % 2 == 0)
 	{
+		if(philo->data->forks_available[philo->id - 1] == 1)
+			return ;
 		pthread_mutex_lock(philo->right_fork);
 		philo->data->forks_available[philo->id] = 1;
 		philo->data->current_time = get_time();
@@ -47,7 +52,6 @@ void take_forks(t_philo *philo)
 		printf("%lld %d has taken a fork\n", philo->data->current_time, philo->id);
 		eat(philo);
 	}
-	
 	
 }
 

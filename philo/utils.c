@@ -12,7 +12,7 @@
 
 #include "philosophers.h"
 
-unsigned long long	get_time(void)
+long long	get_time(void)
 {
 	//we use static because we need the unix time one time, and when we call again get_time is reinitializing
 	static struct timeval		unix_clock;

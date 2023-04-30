@@ -42,16 +42,20 @@ void	*routine(void *philo_data)
 			philo->data->sim_stop = 1;
 			break ;
 		}
-		take_forks(philo);
-		eat(philo);
+		if(philo->data->forks_available[philo->id] == 0 && philo->data->forks_available[philo->id + 1] == 0)
+		{
+			take_forks(philo);
+			
+		}
 		philo->data->meals_eaten++;
 		philo->data->last_meal_time = get_time();
-		sleep_and_think(philo);
+		if(philo->state == 2)
+			sleep_and_think(philo);
 	}
 	return 0;
 }
 
-void	parse_args(int argc, char **argv, t_data *data)
+int	parse_args(int argc, char **argv, t_data *data)
 {
 	if(argc == 5 || argc == 6)
 	{
@@ -62,10 +66,12 @@ void	parse_args(int argc, char **argv, t_data *data)
 		if(argc == 6)
 			data->n_meals = ft_atoi(argv[5]);
 		if(data->n_philo <= 0 || data->time_die <= 0 || data->time_eat <= 0 || data->time_sleep <= 0)
+		{
 			printf("Invalid arguments\n");
+			return(0);
+		}
 	}
-	else
-		printf("Invalid arguments\n");
+	return (1);
 }
 
 int	main(int argc, char **argv)
@@ -75,12 +81,15 @@ int	main(int argc, char **argv)
 	pthread_t	*threads;
 	pthread_mutex_t *forks;
 	int	i;
-
-	parse_args(argc, argv, &data);
 	
+
+	if(!parse_args(argc, argv, &data))
+		return (1);
 	threads = malloc(sizeof(pthread_t) * data.n_philo);
 	forks = malloc(sizeof(pthread_mutex_t) * data.n_philo);
 	philo = malloc(sizeof(t_philo) * data.n_philo);
+	data.forks_available = malloc(sizeof(int) * data.n_philo);
+	memset(data.forks_available, 0, sizeof(int) * data.n_philo);
 	i = -1;
 	//mutex initialized
 	while(++i < data.n_philo)
@@ -89,7 +98,6 @@ int	main(int argc, char **argv)
 
 		//we initialize all mutex
 		pthread_mutex_init(&forks[i], NULL);
-
 		//we initialize the left fork, i is the number of philo, so philo->id 1 = fork 1 in the left
 		philo[i].left_fork = &forks[i];
 		//we initialize the right fork, but i + 1 because is the number of his right so philo->id 1 + 1 = fork 2 
@@ -98,7 +106,7 @@ int	main(int argc, char **argv)
 		//so we need the % for take the right fork of the data.n_philo - 1, in this example: (4+1) % 5 = 0, so is the 
 		//0 position of the array, so, if the left of id 1 is 1, the left of 5 is 0.
 		philo[i].right_fork = &forks[(i + 1) % data.n_philo];
-
+		//initialize all forks available
 		philo[i].data = &data;
 		//number of threads created are the philo passed in argv[1]
 		if (pthread_create(&threads[i], NULL, &routine, &philo[i]) != 0) 
@@ -119,5 +127,6 @@ int	main(int argc, char **argv)
 
 	free(threads);
 	free(forks);
+	free(data.forks_available);
 	return (0);
 }

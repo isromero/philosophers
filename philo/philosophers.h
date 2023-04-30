@@ -19,21 +19,23 @@
 #include <pthread.h>
 #include <stdbool.h>
 #include <sys/time.h>
+#include <string.h>
 
 typedef struct	s_data
 {
 	int	n_philo;
-	unsigned long long	time_die;
-	unsigned long long	time_eat;
-	unsigned long long	time_sleep;
-	unsigned long long	time_think;
-	unsigned long long	start_time;
-	unsigned long long	current_time;
-	unsigned long long	last_meal_time;
-	unsigned long long	last_fork_time;
-	int	n_meals;
-	int	sim_stop;
-	int	meals_eaten;
+	long long	time_die;
+	long long	time_eat;
+	long long	time_sleep;
+	long long	time_think;
+	long long	start_time;
+	long long	current_time;
+	long long	last_meal_time;
+	long long	last_fork_time;
+	int		n_meals;
+	int		sim_stop;
+	int		meals_eaten;
+	int		*forks_available;
 }	t_data;
 
 typedef struct	s_philo
@@ -47,6 +49,7 @@ typedef struct	s_philo
 
 /* philosophers.c */
 void	*routine(void *philo_data);
+int		parse_args(int argc, char **argv, t_data *data);
 
 /* actions.c */
 void	take_forks(t_philo *philo);
@@ -55,7 +58,7 @@ void	sleep_and_think(t_philo *philo);
 void    waiter(t_philo *philo);
 
 /* utils */
-int		ft_atoi(const char *str);
-unsigned long long	get_time(void);
+int			ft_atoi(const char *str);
+long long	get_time(void);
 
 #endif

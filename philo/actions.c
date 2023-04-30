@@ -38,11 +38,11 @@ void take_forks(t_philo *philo)
 	if(philo->id % 2 == 0)
 	{
 		pthread_mutex_lock(philo->right_fork);
-		philo->data->forks_available[philo->id + 1] = 1;
+		philo->data->forks_available[philo->id] = 1;
 		philo->data->current_time = get_time();
 		printf("%lld %d has taken a fork\n", philo->data->current_time, philo->id);
 		pthread_mutex_lock(philo->left_fork);
-		philo->data->forks_available[philo->id] = 1;
+		philo->data->forks_available[philo->id - 1] = 1;
 		philo->data->current_time = get_time();
 		printf("%lld %d has taken a fork\n", philo->data->current_time, philo->id);
 		eat(philo);
@@ -59,9 +59,9 @@ void	eat(t_philo *philo)
 	usleep(philo->data->time_eat * 1000);
 
 	pthread_mutex_unlock(philo->left_fork);
-	philo->data->forks_available[philo->id] = 0;
+	philo->data->forks_available[philo->id - 1] = 0;
 	pthread_mutex_unlock(philo->right_fork);
-	philo->data->forks_available[philo->id + 1] = 0;
+	philo->data->forks_available[philo->id] = 0;
 }
 
 void	sleep_and_think(t_philo *philo)

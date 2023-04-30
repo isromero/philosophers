@@ -24,6 +24,7 @@ void	*routine(void *philo_data)
 	philo->state = 0;
 	while(!(philo->data->sim_stop == 1))
 	{
+
 		if(philo->data->n_philo == 1)
 		{
 			printf("%llu %d died\n", get_time(), philo->id);
@@ -42,7 +43,7 @@ void	*routine(void *philo_data)
 			philo->data->sim_stop = 1;
 			break ;
 		}
-		if(philo->data->forks_available[philo->id] == 0 && philo->data->forks_available[philo->id + 1] == 0)
+		if(philo->data->forks_available[philo->id - 1] == 0 && philo->data->forks_available[philo->id] == 0)
 		{
 			take_forks(philo);
 			
@@ -90,6 +91,7 @@ int	main(int argc, char **argv)
 	philo = malloc(sizeof(t_philo) * data.n_philo);
 	data.forks_available = malloc(sizeof(int) * data.n_philo);
 	memset(data.forks_available, 0, sizeof(int) * data.n_philo);
+	
 	i = -1;
 	//mutex initialized
 	while(++i < data.n_philo)

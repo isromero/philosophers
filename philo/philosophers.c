@@ -19,8 +19,10 @@ void* check_time_to_die(void* arg)
   	{
     for (int i = 0; i < philo->data->n_philo; i++)
     {
+		pthread_mutex_lock(&philo->meal_time);
       	if (philo[i].state != 2 && (get_time() - philo[i].data->last_meal_time) >= philo[i].data->time_die)
       	{
+			pthread_mutex_unlock(&philo->meal_time);
         	// El filósofo ha muerto, establecer la variable de fin de simulación
 			pthread_mutex_lock(&philo->sim_stop);
 			philo->data->sim_stop = 1;
@@ -30,14 +32,18 @@ void* check_time_to_die(void* arg)
 			pthread_mutex_unlock(&philo->write_mutex);
        		exit(1); //can't use exit
       	}
+		pthread_mutex_unlock(&philo->meal_time);
 		// si se ha alcanzado el número de comidas, establecer la variable de fin de simulación
+		pthread_mutex_lock(&philo->meals_eaten_mutex);
 		if (philo->data->n_meals > 0 && philo->data->meals_eaten >= philo->data->n_philo * philo->data->n_meals)
 		{
+			pthread_mutex_unlock(&philo->meals_eaten_mutex);
 			pthread_mutex_lock(&philo->sim_stop);
 			philo->data->sim_stop = 1;
 			pthread_mutex_unlock(&philo->sim_stop);
 			return (NULL);
 		}
+		pthread_mutex_unlock(&philo->meals_eaten_mutex);
     }
 	usleep(1000);
   }
@@ -69,6 +75,7 @@ void	*routine(void *philo_data)
 		if(philo->state == 2)
 			sleep_and_think(philo);
 		pthread_mutex_unlock(&philo->state_mutex);
+		/* pthread_mutex_lock(&philo->state_mutex); */
 	}
 	return 0;
 }
@@ -121,6 +128,7 @@ int	main(int argc, char **argv)
 	pthread_mutex_init(&philo->meal_time, NULL);
 	pthread_mutex_init(&philo->state_mutex, NULL);
 	pthread_mutex_init(&philo->available_forks, NULL);
+	pthread_mutex_init(&philo->meals_eaten_mutex, NULL);
 
 	i = -1;
 	//mutex initialized
@@ -166,6 +174,7 @@ int	main(int argc, char **argv)
 	pthread_mutex_destroy(&philo->meal_time);
 	pthread_mutex_destroy(&philo->state_mutex);
 	pthread_mutex_destroy(&philo->available_forks);
+	pthread_mutex_destroy(&philo->meals_eaten_mutex);
 	free(threads);
 	free(forks);
 	free(data.forks_available);

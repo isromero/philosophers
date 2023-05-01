@@ -71,7 +71,10 @@ void	*routine(void *philo_data)
 			take_forks(philo);
 			pthread_mutex_lock(&philo->sim_stop);
 			if(philo->data->sim_stop == 1)
+			{
+				pthread_mutex_unlock(&philo->sim_stop);
 				return (0);
+			}
 			pthread_mutex_unlock(&philo->sim_stop);
 			eat(philo);
 		}

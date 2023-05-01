@@ -59,6 +59,7 @@ void	*routine(void *philo_data)
 			take_forks(philo);
 			eat(philo);
 		}
+		
 		if(philo->state == 2)
 			sleep_and_think(philo);
 	}
@@ -112,6 +113,7 @@ int	main(int argc, char **argv)
 	pthread_mutex_init(&philo->sim_stop, NULL);
 	pthread_mutex_init(&philo->meal_time, NULL);
 	pthread_mutex_init(&philo->state_mutex, NULL);
+	pthread_mutex_init(&philo->available_forks, NULL);
 
 	i = -1;
 	//mutex initialized
@@ -154,6 +156,7 @@ int	main(int argc, char **argv)
 	pthread_mutex_destroy(&philo->sim_stop);
 	pthread_mutex_destroy(&philo->meal_time);
 	pthread_mutex_destroy(&philo->state_mutex);
+	pthread_mutex_destroy(&philo->available_forks);
 	free(threads);
 	free(forks);
 	free(data.forks_available);

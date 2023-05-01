@@ -24,30 +24,54 @@ void take_forks(t_philo *philo)
 	/* pintf("[%d] is trying to take forks\n", philo->id); */
 	if (philo->id % 2 == 0)
 	{
-		if(philo->data->forks_available[philo->id] == 1)
-			return ;
+		if (philo->data->forks_available[philo->id] == 1)
+        {
+            pthread_mutex_unlock(&philo->available_forks);
+            return;
+        }
 		pthread_mutex_lock(philo->left_fork);
+
+		pthread_mutex_lock(&philo->available_forks);
 		philo->data->forks_available[philo->id - 1] = 1;
+		pthread_mutex_unlock(&philo->available_forks);
+
 		pthread_mutex_lock(&philo->write_mutex);
 		printf("%lld %d has taken a fork\n", get_time(), philo->id);
 		pthread_mutex_unlock(&philo->write_mutex);
+
 		pthread_mutex_lock(philo->right_fork);
+
+		pthread_mutex_lock(&philo->available_forks);
 		philo->data->forks_available[philo->id] = 1;
+		pthread_mutex_unlock(&philo->available_forks);
+
 		pthread_mutex_lock(&philo->write_mutex);
 		printf("%lld %d has taken a fork\n", get_time(), philo->id);
 		pthread_mutex_unlock(&philo->write_mutex);
 	}
 	if(philo->id % 2 == 1)
 	{
-		if(philo->data->forks_available[philo->id - 1] == 1)
-			return ;
+		if (philo->data->forks_available[philo->id - 1] == 1)
+        {
+            pthread_mutex_unlock(&philo->available_forks);
+            return;
+        }
 		pthread_mutex_lock(philo->right_fork);
+
+		pthread_mutex_lock(&philo->available_forks);
 		philo->data->forks_available[philo->id] = 1;
+		pthread_mutex_unlock(&philo->available_forks);
+
 		pthread_mutex_lock(&philo->write_mutex);
 		printf("%lld %d has taken a fork\n", get_time(), philo->id);
 		pthread_mutex_unlock(&philo->write_mutex);
+
 		pthread_mutex_lock(philo->left_fork);
+
+		pthread_mutex_lock(&philo->available_forks);
 		philo->data->forks_available[philo->id - 1] = 1;
+		pthread_mutex_unlock(&philo->available_forks);
+
 		pthread_mutex_lock(&philo->write_mutex);
 		printf("%lld %d has taken a fork\n", get_time(), philo->id);
 		pthread_mutex_unlock(&philo->write_mutex);
@@ -59,16 +83,26 @@ void	eat(t_philo *philo)
 	pthread_mutex_lock(&philo->state_mutex);
 	philo->state = 2;
 	pthread_mutex_unlock(&philo->state_mutex);
+
 	pthread_mutex_lock(&philo->write_mutex);
 	printf("%lld %d is eating\n", get_time(), philo->id);
 	pthread_mutex_unlock(&philo->write_mutex);
+	
 	usleep(philo->data->time_eat * 1000);
 
 	pthread_mutex_unlock(philo->left_fork);
-	philo->data->forks_available[philo->id - 1] = 0;
 	pthread_mutex_unlock(philo->right_fork);
+	
+	pthread_mutex_lock(&philo->available_forks);
+	philo->data->forks_available[philo->id - 1] = 0;
+	pthread_mutex_unlock(&philo->available_forks);
+
+	pthread_mutex_lock(&philo->available_forks);
 	philo->data->forks_available[philo->id] = 0;
+	pthread_mutex_unlock(&philo->available_forks);
+
 	philo->data->meals_eaten++;
+
 	pthread_mutex_lock(&philo->meal_time);
 	philo->data->last_meal_time = get_time();
 	pthread_mutex_unlock(&philo->meal_time);
@@ -79,15 +113,21 @@ void	sleep_and_think(t_philo *philo)
 	pthread_mutex_lock(&philo->write_mutex);
 	printf("%lld %d is sleeping\n", get_time(), philo->id);
 	pthread_mutex_unlock(&philo->write_mutex);
+
 	usleep(philo->data->time_sleep * 1000);
+
 	pthread_mutex_lock(&philo->state_mutex);
 	philo->state = 0;
 	pthread_mutex_unlock(&philo->state_mutex);
-	
+
 	pthread_mutex_lock(&philo->write_mutex);
 	printf("%lld %d is thinking\n", get_time(), philo->id);
 	pthread_mutex_unlock(&philo->write_mutex);
-	
+
+	pthread_mutex_lock(&philo->state_mutex);
+	philo->state = 1;
+	pthread_mutex_unlock(&philo->state_mutex);
+
 }
 
 /* void    waiter(t_philo *philo)

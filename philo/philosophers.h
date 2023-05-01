@@ -45,6 +45,9 @@ typedef struct	s_philo
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t write_mutex;
+	pthread_mutex_t sim_stop;
+	pthread_mutex_t meal_time;
+	pthread_mutex_t state_mutex;
 	t_data	*data;
 } t_philo;
 
@@ -56,7 +59,6 @@ int		parse_args(int argc, char **argv, t_data *data);
 void	take_forks(t_philo *philo);
 void	eat(t_philo *philo);
 void	sleep_and_think(t_philo *philo);
-void    waiter(t_philo *philo);
 
 /* utils */
 int			ft_atoi(const char *str);

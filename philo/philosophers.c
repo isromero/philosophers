@@ -22,7 +22,9 @@ void* check_time_to_die(void* arg)
       	if (philo[i].state != 2 && (get_time() - philo[i].data->last_meal_time) >= philo[i].data->time_die)
       	{
         	// El filósofo ha muerto, establecer la variable de fin de simulación
+			pthread_mutex_lock(&philo->sim_stop);
 			philo->data->sim_stop = 1;
+			pthread_mutex_unlock(&philo->sim_stop);
         	pthread_mutex_lock(&philo->write_mutex);
         	printf("%llu %d died\n", get_time(), philo[i].id);
 			pthread_mutex_unlock(&philo->write_mutex);
@@ -31,10 +33,13 @@ void* check_time_to_die(void* arg)
 		// si se ha alcanzado el número de comidas, establecer la variable de fin de simulación
 		if (philo->data->n_meals > 0 && philo->data->meals_eaten >= philo->data->n_philo * philo->data->n_meals)
 		{
+			pthread_mutex_lock(&philo->sim_stop);
 			philo->data->sim_stop = 1;
+			pthread_mutex_unlock(&philo->sim_stop);
 			return (NULL);
 		}
     }
+	usleep(1000);
   }
   return (0);
 }
@@ -45,9 +50,6 @@ void	*routine(void *philo_data)
 
 	//the thread routine, we cast the void*
 	philo = (t_philo *)philo_data;
-	philo->data->meals_eaten = 0;
-	philo->data->sim_stop = 0;
-	philo->state = 0;
 	while(!(philo->data->sim_stop == 1))
 	{
 		if(philo->data->sim_stop == 1)
@@ -107,7 +109,10 @@ int	main(int argc, char **argv)
 	memset(data.forks_available, 0, sizeof(int) * data.n_philo);
 	pthread_t death_check_thread;
 	pthread_mutex_init(&philo->write_mutex, NULL);
-	
+	pthread_mutex_init(&philo->sim_stop, NULL);
+	pthread_mutex_init(&philo->meal_time, NULL);
+	pthread_mutex_init(&philo->state_mutex, NULL);
+
 	i = -1;
 	//mutex initialized
 	while(++i < data.n_philo)
@@ -146,6 +151,9 @@ int	main(int argc, char **argv)
 	while(++i < data.n_philo)
 		pthread_mutex_destroy(&forks[i]);
 	pthread_mutex_destroy(&philo->write_mutex);
+	pthread_mutex_destroy(&philo->sim_stop);
+	pthread_mutex_destroy(&philo->meal_time);
+	pthread_mutex_destroy(&philo->state_mutex);
 	free(threads);
 	free(forks);
 	free(data.forks_available);

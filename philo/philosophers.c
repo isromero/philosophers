@@ -50,18 +50,25 @@ void	*routine(void *philo_data)
 
 	//the thread routine, we cast the void*
 	philo = (t_philo *)philo_data;
+	pthread_mutex_lock(&philo->sim_stop);
 	while(!(philo->data->sim_stop == 1))
 	{
+		pthread_mutex_unlock(&philo->sim_stop);
+		pthread_mutex_lock(&philo->sim_stop);
 		if(philo->data->sim_stop == 1)
 			return (0);
+		pthread_mutex_unlock(&philo->sim_stop);
+		pthread_mutex_lock(&philo->available_forks);
 		if(philo->data->forks_available[philo->id - 1] == 0 && philo->data->forks_available[philo->id] == 0)
 		{
+			pthread_mutex_unlock(&philo->available_forks);
 			take_forks(philo);
 			eat(philo);
 		}
-		
+		pthread_mutex_lock(&philo->state_mutex);
 		if(philo->state == 2)
 			sleep_and_think(philo);
+		pthread_mutex_unlock(&philo->state_mutex);
 	}
 	return 0;
 }
@@ -133,7 +140,9 @@ int	main(int argc, char **argv)
 		philo[i].right_fork = &forks[(i + 1) % data.n_philo];
 		//initialize all forks available
 		philo[i].data = &data;
+		pthread_mutex_lock(&philo->meal_time);
 		philo[i].data->last_meal_time = get_time();
+		pthread_mutex_unlock(&philo->meal_time);
 		//number of threads created are the philo passed in argv[1]
 		if (pthread_create(&threads[i], NULL, &routine, &philo[i]) != 0) 
 		{

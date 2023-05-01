@@ -49,6 +49,7 @@ typedef struct	s_philo
 	pthread_mutex_t meal_time;
 	pthread_mutex_t state_mutex;
 	pthread_mutex_t available_forks;
+	pthread_mutex_t forks_mutex;
 	t_data	*data;
 } t_philo;
 

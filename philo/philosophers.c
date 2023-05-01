@@ -12,30 +12,31 @@
 
 #include "philosophers.h"
 
-void *check_time_to_die(void *arg)
+void* check_time_to_die(void* arg)
 {
-  t_philo *philo = (t_philo *)arg;
-
-  while (philo->data->sim_stop != 1)
-  {
-    // Obtener el tiempo actual
-    long long current_time = get_time();
-
-    // Comprobar si algún filósofo ha muerto
+  	t_philo *philo = (t_philo *) arg;
+  	while (1)
+  	{
     for (int i = 0; i < philo->data->n_philo; i++)
     {
-      if (philo->state != 2 && (current_time - philo->data->last_meal_time) >= philo->data->time_die)
-      {
-        // El filósofo ha muerto, establecer la variable de fin de simulación
-        philo->data->sim_stop = 1;
-        printf("%llu %d died\n", get_time(), philo->id);
-        return (NULL);
-      }
+      	if (philo[i].state != 2 && (get_time() - philo[i].data->last_meal_time) >= philo[i].data->time_die)
+      	{
+        	// El filósofo ha muerto, establecer la variable de fin de simulación
+			philo->data->sim_stop = 1;
+        	pthread_mutex_lock(&philo->write_mutex);
+        	printf("%llu %d died\n", get_time(), philo[i].id);
+			pthread_mutex_unlock(&philo->write_mutex);
+       		exit(1); //can't use exit
+      	}
+		// si se ha alcanzado el número de comidas, establecer la variable de fin de simulación
+		if (philo->data->n_meals > 0 && philo->data->meals_eaten >= philo->data->n_philo * philo->data->n_meals)
+		{
+			philo->data->sim_stop = 1;
+			return (NULL);
+		}
     }
-    // Esperar un tiempo corto antes de volver a comprobar
-    usleep(1000);
   }
-  return (NULL);
+  return (0);
 }
 
 void	*routine(void *philo_data)
@@ -46,24 +47,16 @@ void	*routine(void *philo_data)
 	philo = (t_philo *)philo_data;
 	philo->data->meals_eaten = 0;
 	philo->data->sim_stop = 0;
-	philo->data->last_meal_time = 0;
 	philo->state = 0;
 	while(!(philo->data->sim_stop == 1))
 	{
-		if(philo->data->n_philo == 1)
-			break ;
 		if(philo->data->sim_stop == 1)
-			break ;
-		// si se ha alcanzado el número de comidas, establecer la variable de fin de simulación
-		if (philo->data->n_meals > 0 && philo->data->meals_eaten >= philo->data->n_philo * philo->data->n_meals)
-		{
-			philo->data->sim_stop = 1;
-			break ;
-		}
+			return (0);
 		if(philo->data->forks_available[philo->id - 1] == 0 && philo->data->forks_available[philo->id] == 0)
+		{
 			take_forks(philo);
-		philo->data->meals_eaten++;
-		philo->data->last_meal_time = get_time();
+			eat(philo);
+		}
 		if(philo->state == 2)
 			sleep_and_think(philo);
 	}
@@ -112,7 +105,8 @@ int	main(int argc, char **argv)
 	philo = malloc(sizeof(t_philo) * data.n_philo);
 	data.forks_available = malloc(sizeof(int) * data.n_philo);
 	memset(data.forks_available, 0, sizeof(int) * data.n_philo);
-	data.start_time = get_time();
+	pthread_t death_check_thread;
+	pthread_mutex_init(&philo->write_mutex, NULL);
 	
 	i = -1;
 	//mutex initialized
@@ -132,26 +126,26 @@ int	main(int argc, char **argv)
 		philo[i].right_fork = &forks[(i + 1) % data.n_philo];
 		//initialize all forks available
 		philo[i].data = &data;
+		philo[i].data->last_meal_time = get_time();
 		//number of threads created are the philo passed in argv[1]
 		if (pthread_create(&threads[i], NULL, &routine, &philo[i]) != 0) 
 		{
 			printf("Error creating thread\n");
-			return (1); //can't use exit
+			return (1);
 		}
 	}
-	pthread_t death_check_thread;
-	pthread_create(&death_check_thread, NULL, check_time_to_die, &(philo[0]));
-	pthread_join(death_check_thread, NULL);
+	pthread_create(&death_check_thread, NULL, check_time_to_die, philo);
+
 	i = -1;
 	//wait until all threads finished
-	//i is incremented first of all, for start with thread 1
 	while(++i < data.n_philo)
 		pthread_join(threads[i], NULL);
 	
+	pthread_join(death_check_thread, NULL);
 	i = -1;
 	while(++i < data.n_philo)
 		pthread_mutex_destroy(&forks[i]);
-
+	pthread_mutex_destroy(&philo->write_mutex);
 	free(threads);
 	free(forks);
 	free(data.forks_available);

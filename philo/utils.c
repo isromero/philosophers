@@ -6,7 +6,7 @@
 /*   By: isromero <isromero@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/27 09:50:34 by isromero          #+#    #+#             */
-/*   Updated: 2023/04/27 09:50:34 by isromero         ###   ########.fr       */
+/*   Updated: 2023/05/02 20:11:32 by isromero         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,28 @@ long long	get_time(void)
         return (0);
     }
 	return (((current_time.tv_sec - unix_clock.tv_sec) * 1000) + ((current_time.tv_usec - unix_clock.tv_usec) / 1000));
+}
+
+t_philo	*add_node_to_cllist(t_philo **last)
+{
+	t_philo	*newnode;
+
+	newnode = malloc(sizeof(t_philo));
+	if (!newnode)
+		return (NULL);
+	newnode->next = NULL;
+	if (*last)
+	{
+		newnode->next = (*last)->next;
+		(*last)->next = newnode;
+		*last = newnode;
+	}
+	else
+	{
+		newnode->next = newnode;
+		*last = newnode;
+	}
+	return (newnode);
 }
 
 int	ft_atoi(const char *str)

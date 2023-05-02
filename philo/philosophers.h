@@ -21,39 +21,37 @@
 #include <sys/time.h>
 #include <string.h>
 
-typedef struct	s_data
+typedef struct	s_shared
 {
-	int	n_philo;
-	long long	time_die;
-	long long	time_eat;
-	long long	time_sleep;
-	long long	time_think;
-	long long	start_time;
-	long long	current_time;
-	long long	last_meal_time;
-	long long	last_fork_time;
-	int		n_meals;
-	int		sim_stop;
-	int		meals_eaten;
-	int		*forks_available;
-}	t_data;
+	int					n_philo;
+	int					n_meals;
+	
+	long long			time_to_die;
+	long long			time_to_eat;
+	long long			time_to_sleep;
+}	t_shared;
 
 typedef struct	s_philo
 {
-	int	id;
-	int	state;
-	pthread_mutex_t	*left_fork;
-	pthread_mutex_t	*right_fork;
-	pthread_mutex_t write_mutex;
-	pthread_mutex_t sim_stop;
-	pthread_mutex_t meal_time;
-	pthread_mutex_t meals_eaten_mutex;
-	t_data	*data;
-} t_philo;
+	pthread_t			thread;
+	int					id;
+	int					meals_eaten;
+	long long			start_time;
+	long long			last_meal_time;
+	long long			last_meal_eat;
+	
+	pthread_mutex_t		fork;
+	pthread_mutex_t		last_meal_time_access;
+	pthread_mutex_t		meals;
+	pthread_mutex_t		died;
+
+	t_shared			*shared;
+	struct s_philo 		*next;
+}	t_philo;
 
 /* philosophers.c */
 void	*routine(void *philo_data);
-int		parse_args(int argc, char **argv, t_data *data);
+int		parse_args(int argc, char **argv, t_shared *shared);
 
 /* actions.c */
 void	take_forks(t_philo *philo);
@@ -61,7 +59,12 @@ void	eat(t_philo *philo);
 void	sleep_and_think(t_philo *philo);
 
 /* utils */
-int			ft_atoi(const char *str);
 long long	get_time(void);
+t_philo		*add_node_to_cllist(t_philo **philo);
+int			ft_atoi(const char *str);
+
+/* data	*/
+void		init_data_philo(t_philo *philo);
+void		free_data(t_philo *philo);
 
 #endif

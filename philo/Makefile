@@ -14,7 +14,7 @@ NAME		=	philo
 CC			=	gcc
 SRCS		=	philosophers.c actions.c utils.c
 
-CFLAGS		=	-Wall -Werror -Wextra -pthread
+CFLAGS		=	-Wall -Werror -Wextra -pthread 
 RM			=	rm -f
 OBJS		=	$(SRCS:%.c=%.o)
 

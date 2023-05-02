@@ -17,10 +17,9 @@ void* check_time_to_die(void* arg)
   	t_philo *philo = (t_philo *) arg;
   	while (1)
   	{
-			pthread_mutex_lock(&philo->state_mutex);
-      		if (philo->state != 2 && (get_time() - philo->data->last_meal_time) >= philo->data->time_die)
+			pthread_mutex_lock(&philo->meal_time);
+      		if ((get_time() - philo->data->last_meal_time) >= philo->data->time_die)
       		{
-				pthread_mutex_unlock(&philo->state_mutex);
 				pthread_mutex_unlock(&philo->meal_time);
         		// El filósofo ha muerto, establecer la variable de fin de simulación
 				pthread_mutex_lock(&philo->sim_stop);
@@ -29,9 +28,8 @@ void* check_time_to_die(void* arg)
         		pthread_mutex_lock(&philo->write_mutex);
         		printf("%llu %d died\n", get_time(), philo->id);
 				pthread_mutex_unlock(&philo->write_mutex);
-       			exit(1); //can't use exit
+       			exit (0); //can't use exit
       		}
-			pthread_mutex_unlock(&philo->state_mutex);
 			pthread_mutex_unlock(&philo->meal_time);
 			// si se ha alcanzado el número de comidas, establecer la variable de fin de simulación
 			pthread_mutex_lock(&philo->meals_eaten_mutex);
@@ -41,7 +39,7 @@ void* check_time_to_die(void* arg)
 				pthread_mutex_lock(&philo->sim_stop);
 				philo->data->sim_stop = 1;
 				pthread_mutex_unlock(&philo->sim_stop);
-				return (NULL);
+				return (0);
 			}
 			pthread_mutex_unlock(&philo->meals_eaten_mutex);
 		usleep(1000);
@@ -62,13 +60,16 @@ void	*routine(void *philo_data)
 	{
 		pthread_mutex_lock(&philo->sim_stop);
 		if(philo->data->sim_stop == 1)
+		{
+			pthread_mutex_unlock(&philo->sim_stop);
 			return (0);
+		}
 		pthread_mutex_unlock(&philo->sim_stop);
-		pthread_mutex_lock(&philo->available_forks);
 		if(philo->data->forks_available[philo->id - 1] == 0 && philo->data->forks_available[philo->id] == 0)
 		{
 			pthread_mutex_unlock(&philo->available_forks);
 			take_forks(philo);
+			
 			pthread_mutex_lock(&philo->sim_stop);
 			if(philo->data->sim_stop == 1)
 			{
@@ -79,10 +80,13 @@ void	*routine(void *philo_data)
 			eat(philo);
 		}
 		pthread_mutex_lock(&philo->state_mutex);
-		if(philo->state == 2)
+		if(philo->state == 1)
+		{
 			sleep_and_think(philo);
-		pthread_mutex_unlock(&philo->state_mutex);
-		pthread_mutex_lock(&philo->state_mutex);
+			pthread_mutex_unlock(&philo->state_mutex);
+		}
+		if(philo->state != 1 && philo->state != 2 && philo->state != 3)
+			pthread_mutex_unlock(&philo->state_mutex);
 	}
 	return 0;
 }

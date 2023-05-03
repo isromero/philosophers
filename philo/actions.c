@@ -22,15 +22,35 @@ void take_forks(t_philo *philo)
 	{
 		pthread_mutex_lock(&philo->fork);
 		printf("%lldms %d has taken a fork\n", get_time(), philo->id);
+		if(philo->is_dead == 1)
+		{
+			pthread_mutex_unlock(&philo->fork);
+			return ;
+		}
 		pthread_mutex_lock(&philo->next->fork);
 		printf("%lldms %d has taken a fork\n", get_time(), philo->id);
+		if(philo->is_dead == 1)
+		{
+			pthread_mutex_unlock(&philo->next->fork);
+			return ;
+		}
 	}
 	if(philo->id % 2 == 0)
 	{
 		pthread_mutex_lock(&philo->next->fork);
 		printf("%lldms %d has taken a fork\n", get_time(), philo->id);
+		if(philo->is_dead == 1)
+		{
+			pthread_mutex_unlock(&philo->next->fork);
+			return ;
+		}
 		pthread_mutex_lock(&philo->fork);
 		printf("%lldms %d has taken a fork\n", get_time(), philo->id);
+		if(philo->is_dead == 1)
+		{
+			pthread_mutex_unlock(&philo->fork);
+			return ;
+		}
 	}
 }
 
@@ -44,7 +64,10 @@ void	eat(t_philo *philo)
 	pthread_mutex_unlock(&philo->next->fork);
 }
 
-/* void	sleep_and_think(t_philo *philo)
+void	sleep_and_think(t_philo *philo)
 {
+	printf("%lldms %d is sleeping\n", get_time(), philo->id);
+	usleep(philo->shared->time_to_sleep * 1000);
 
-} */
+	printf("%lldms %d is thinking\n", get_time(), philo->id);
+}

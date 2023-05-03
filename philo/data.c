@@ -18,6 +18,7 @@ void	init_data_philo(t_philo *philo)
 	philo->meals_eaten = 0;
 	philo->last_meal_time = 0;
 	philo->last_meal_eat = 0;
+	philo->is_dead = 0;
 	pthread_mutex_init(&philo->died, NULL);
 	pthread_mutex_init(&philo->meals, NULL);
 	pthread_mutex_init(&philo->last_meal_time_access, NULL);
@@ -26,15 +27,8 @@ void	init_data_philo(t_philo *philo)
 
 void	free_data(t_philo *philo)
 {
-	t_philo *tmp;
-	while (philo)
-	{
-		tmp = philo->next;
-		pthread_mutex_destroy(&philo->died);
-		pthread_mutex_destroy(&philo->meals);
-		pthread_mutex_destroy(&philo->last_meal_time_access);
-		pthread_mutex_destroy(&philo->fork);
-		free(philo);
-		philo = tmp;
-	}
+	pthread_mutex_destroy(&philo->died);
+	pthread_mutex_destroy(&philo->meals);
+	pthread_mutex_destroy(&philo->last_meal_time_access);
+	pthread_mutex_destroy(&philo->fork);
 }

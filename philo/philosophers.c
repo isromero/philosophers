@@ -20,7 +20,9 @@ void	*check_philosophers(void* arg)
 		if(get_time() - philo->last_meal_time >= philo->shared->time_to_die)
 		{
 			printf("%lldms %d died\n", get_time(), philo->id);
-			free_data(philo);
+			pthread_mutex_lock(&philo->died);
+			philo->is_dead = 1;
+			pthread_mutex_unlock(&philo->died);
 			return (0);
 		}
 	}
@@ -36,7 +38,8 @@ void	*routine(void *philo_data)
 	while(1)
 	{
 		take_forks(philo);
-		break ;
+		eat(philo);
+		sleep_and_think(philo);
 	}
 	return 0;
 }
@@ -90,12 +93,13 @@ int	main(int argc, char **argv)
 		new_philo->id = i + 1;
 		new_philo->shared = &shared;
 		pthread_create(&new_philo->thread, NULL, &routine, new_philo);
+		pthread_detach(new_philo->thread); ///////////////////
 		last_philo = new_philo;
 		i++;
 	}
 	last_philo->next = philo;
 	pthread_create(&check_thread, NULL, &check_philosophers, philo);
-
+	
 	i = 0;
 	while(i < shared.n_philo)
 	{
@@ -103,17 +107,7 @@ int	main(int argc, char **argv)
 		philo = philo->next;
 		i++;
 	}
-	t_philo *tmp;
-	while (philo)
-	{
-		tmp = philo->next;
-		pthread_mutex_destroy(&philo->died);
-		pthread_mutex_destroy(&philo->meals);
-		pthread_mutex_destroy(&philo->last_meal_time_access);
-		pthread_mutex_destroy(&philo->fork);
-		free(philo);
-		philo = tmp;
-	}
+	free_data(philo);
 	pthread_join(check_thread, NULL);
 	return (0);
 }

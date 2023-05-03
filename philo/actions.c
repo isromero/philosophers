@@ -66,8 +66,6 @@ void	eat(t_philo *philo)
 
 	pthread_mutex_unlock(&philo->fork);
 	pthread_mutex_unlock(&philo->next->fork);
-
-	
 }
 
 void	sleep_and_think(t_philo *philo)

@@ -25,6 +25,7 @@ typedef struct	s_shared
 {
 	int					n_philo;
 	int					n_meals;
+	int					meals_eaten;
 	
 	long long			time_to_die;
 	long long			time_to_eat;
@@ -35,16 +36,14 @@ typedef struct	s_philo
 {
 	pthread_t			thread;
 	int					id;
-	int					meals_eaten;
 	long long			start_time;
 	long long			last_meal_time;
-	long long			last_meal_eat;
-	int					is_dead;
+	int					sim_stop;
 	
 	pthread_mutex_t		fork;
 	pthread_mutex_t		last_meal_time_access;
 	pthread_mutex_t		meals;
-	pthread_mutex_t		died;
+	pthread_mutex_t		stop;
 
 	t_shared			*shared;
 	struct s_philo 		*next;
@@ -61,7 +60,7 @@ void	sleep_and_think(t_philo *philo);
 
 /* utils */
 long long	get_time(void);
-t_philo		*add_node_to_cllist(t_philo **philo);
+t_philo		*node_add_back(t_philo **lst);
 int			ft_atoi(const char *str);
 
 /* data	*/

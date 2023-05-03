@@ -35,27 +35,27 @@ long long	get_time(void)
 	return (((current_time.tv_sec - unix_clock.tv_sec) * 1000) + ((current_time.tv_usec - unix_clock.tv_usec) / 1000));
 }
 
-t_philo	*add_node_to_cllist(t_philo **last)
+t_philo	*node_add_back(t_philo **lst)
 {
-	t_philo	*newnode;
-
-	newnode = malloc(sizeof(t_philo));
-	if (!newnode)
+	t_philo *new_node;
+	t_philo *last_node;
+	
+	new_node = malloc(sizeof(t_philo));
+	if (!new_node)
 		return (NULL);
-	newnode->next = NULL;
-	if (*last)
-	{
-		newnode->next = (*last)->next;
-		(*last)->next = newnode;
-		*last = newnode;
-	}
+	new_node->next = NULL;
+	if (!*lst)
+		*lst = new_node;
 	else
 	{
-		newnode->next = newnode;
-		*last = newnode;
+		last_node = *lst;
+		while (last_node->next)
+			last_node = last_node->next;
+		last_node->next = new_node;
 	}
-	return (newnode);
+	return (new_node);
 }
+
 
 int	ft_atoi(const char *str)
 {

@@ -94,10 +94,12 @@ int	main(int argc, char **argv)
 		new_philo->shared = &shared;
 		pthread_create(&new_philo->thread, NULL, &routine, new_philo);
 		pthread_detach(new_philo->thread); ///////////////////
+		if (last_philo != NULL)
+       		last_philo->next = new_philo;
 		last_philo = new_philo;
 		i++;
 	}
-	last_philo->next = philo;
+	last_philo->next = new_philo;
 	pthread_create(&check_thread, NULL, &check_philosophers, philo);
 	
 	i = 0;

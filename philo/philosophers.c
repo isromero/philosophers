@@ -12,6 +12,7 @@
 
 #include "philosophers.h"
 
+
 void	*check_philosophers(void* arg)
 {
 	t_philo	*philo = (t_philo *)arg;
@@ -19,23 +20,22 @@ void	*check_philosophers(void* arg)
 	{
 		if(get_time() - philo->last_meal_time >= philo->shared->time_to_die)
 		{	
-			free_data(philo);
-			printf("%lldms %d died\n", get_time(), philo->id);
+			pthread_mutex_lock(&philo->write);
+			printf("%lld %d died\n", get_time(), philo->id);
+			pthread_mutex_unlock(&philo->write);
 			pthread_mutex_lock(&philo->stop);
 			philo->sim_stop = 1;
 			pthread_mutex_unlock(&philo->stop);
-			return (0);
-		}
-		if(philo->shared->n_meals > 0 && (philo->shared->meals_eaten >= philo->shared->n_meals * philo->shared->n_philo))
-		{
-			free_data(philo);
-			pthread_mutex_lock(&philo->stop);
-			philo->sim_stop = 1;
-			pthread_mutex_unlock(&philo->stop);
-			free_data(philo);
-			return(0);
+			break ;
 		}
 		
+		if(philo->shared->n_meals > 0 && philo->shared->meals_eaten >= philo->shared->n_meals * philo->shared->n_philo)
+		{
+			pthread_mutex_lock(&philo->stop);
+			philo->sim_stop = 1;
+			pthread_mutex_unlock(&philo->stop);
+			break ;
+		}
 		usleep(1000);
 	}
 	return (0);
@@ -46,11 +46,11 @@ void	*routine(void *philo_data)
 	t_philo	*philo;
 
 	philo = (t_philo *)philo_data;
-	philo->shared->meals_eaten = 0;
 	while(1)
 	{
 		take_forks(philo);
 		eat(philo);
+		
 		sleep_and_think(philo);
 	}
 	return 0;
@@ -97,7 +97,8 @@ int	main(int argc, char **argv)
 	philo = NULL;
 	last_philo = NULL;
 	first_philo = NULL;
-	
+	shared.meals_eaten = 0;
+
 	i = 0;
 	while(i < shared.n_philo)
 	{
@@ -113,9 +114,9 @@ int	main(int argc, char **argv)
 		i++;
 	}
 	last_philo->next = first_philo;
-	
 	pthread_create(&check_thread, NULL, &check_philosophers, philo);
-	
+
+	pthread_join(check_thread, NULL);
 	i = 0;
 	while(i < shared.n_philo)
 	{
@@ -123,7 +124,7 @@ int	main(int argc, char **argv)
 		philo = philo->next;
 		i++;
 	}
-	free_data(philo);
-	pthread_join(check_thread, NULL);
+	if(philo->sim_stop == 1)
+		free_data(philo);
 	return (0);
 }

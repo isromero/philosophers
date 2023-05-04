@@ -15,10 +15,11 @@
 void	init_data_philo(t_philo *philo)
 {
 	philo->start_time = 0;
-	
 	philo->last_meal_time = 0;
 	philo->sim_stop = 0;
+	
 	pthread_mutex_init(&philo->stop, NULL);
+	pthread_mutex_init(&philo->write, NULL);
 	pthread_mutex_init(&philo->meals, NULL);
 	pthread_mutex_init(&philo->last_meal_time_access, NULL);
 	pthread_mutex_init(&philo->fork, NULL);
@@ -26,8 +27,16 @@ void	init_data_philo(t_philo *philo)
 
 void	free_data(t_philo *philo)
 {
-	pthread_mutex_destroy(&philo->stop);
-	pthread_mutex_destroy(&philo->meals);
-	pthread_mutex_destroy(&philo->last_meal_time_access);
-	pthread_mutex_destroy(&philo->fork);
+	int	i;
+	t_philo *temp;
+	
+	temp = philo;
+	i = 0;
+	while(i < philo->shared->n_philo)
+	{
+		philo = temp->next;
+		free(temp);
+		temp = philo;
+		i++;
+	}
 }

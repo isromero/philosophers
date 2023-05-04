@@ -18,60 +18,64 @@ his left fork, so they can't get in trouble with the order and we protect a data
 
 void take_forks(t_philo *philo)
 {
-	if (philo->id % 2 == 0)
-	{
-		pthread_mutex_lock(&philo->fork);
-		printf("%lldms %d has taken a fork\n", get_time(), philo->id);
-		if(philo->sim_stop == 1)
-		{
-			pthread_mutex_unlock(&philo->fork);
-			return ;
-		}
-		pthread_mutex_lock(&philo->next->fork);
-		printf("%lldms %d has taken a fork\n", get_time(), philo->id);
-		if(philo->sim_stop == 1)
-		{
-			pthread_mutex_unlock(&philo->next->fork);
-			return ;
-		}
-	}
 	if(philo->id % 2 == 1)
 	{
+		pthread_mutex_lock(&philo->write);
+		printf("%lld %d has taken a fork\n", get_time(), philo->id);
+		pthread_mutex_unlock(&philo->write);
+
 		pthread_mutex_lock(&philo->next->fork);
-		printf("%lldms %d has taken a fork\n", get_time(), philo->id);
-		if(philo->sim_stop == 1)
-		{
-			pthread_mutex_unlock(&philo->next->fork);
-			return ;
-		}
+		pthread_mutex_lock(&philo->write);
+		printf("%lld %d has taken a fork\n", get_time(), philo->id);
+		pthread_mutex_unlock(&philo->write);
+
 		pthread_mutex_lock(&philo->fork);
-		printf("%lldms %d has taken a fork\n", get_time(), philo->id);
-		if(philo->sim_stop == 1)
-		{
-			pthread_mutex_unlock(&philo->fork);
-			return ;
-		}
+	}
+	if (philo->id % 2 == 0)
+	{
+		pthread_mutex_lock(&philo->write);
+		printf("%lld %d has taken a fork\n", get_time(), philo->id);
+		pthread_mutex_unlock(&philo->write);
+
+		pthread_mutex_lock(&philo->fork);
+		pthread_mutex_lock(&philo->write);
+		printf("%lld %d has taken a fork\n", get_time(), philo->id);
+		pthread_mutex_unlock(&philo->write);
+
+		pthread_mutex_lock(&philo->next->fork);
 	}
 }
 
 void	eat(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->last_meal_time_access);
 	philo->last_meal_time = get_time();
-	printf("%lldms %d is eating\n", get_time(), philo->id);
+	pthread_mutex_unlock(&philo->last_meal_time_access);
+
+	pthread_mutex_lock(&philo->write);
+	printf("%lld %d is eating\n", get_time(), philo->id);
+	pthread_mutex_unlock(&philo->write);
+
 	usleep(philo->shared->time_to_eat * 1000);
 
 	pthread_mutex_lock(&philo->meals);
 	philo->shared->meals_eaten++;
 	pthread_mutex_unlock(&philo->meals);
 
-	pthread_mutex_unlock(&philo->fork);
-	pthread_mutex_unlock(&philo->next->fork);
 }
 
 void	sleep_and_think(t_philo *philo)
 {
-	printf("%lldms %d is sleeping\n", get_time(), philo->id);
+	pthread_mutex_lock(&philo->write);
+	printf("%lld %d is sleeping\n", get_time(), philo->id);
+	pthread_mutex_unlock(&philo->write);
+
+	pthread_mutex_unlock(&philo->next->fork);
+	pthread_mutex_unlock(&philo->fork);
+
 	usleep(philo->shared->time_to_sleep * 1000);
 
-	printf("%lldms %d is thinking\n", get_time(), philo->id);
+	pthread_mutex_lock(&philo->write);
+	printf("%lld %d is thinking\n", get_time(), philo->id);
+	pthread_mutex_unlock(&philo->write);
 }

@@ -42,6 +42,7 @@ typedef struct	s_philo
 	
 	pthread_mutex_t		fork;
 	pthread_mutex_t		last_meal_time_access;
+	pthread_mutex_t		write;
 	pthread_mutex_t		meals;
 	pthread_mutex_t		stop;
 

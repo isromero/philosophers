@@ -89,6 +89,7 @@ int	main(int argc, char **argv)
 	t_philo		*last_philo;
 	t_philo		*first_philo;
 	pthread_t 	check_thread;
+	pthread_t	*threads;
 	int			i;
 
 	if(!parse_args(argc, argv, &shared))
@@ -98,6 +99,7 @@ int	main(int argc, char **argv)
 	last_philo = NULL;
 	first_philo = NULL;
 	shared.meals_eaten = 0;
+	threads = malloc(sizeof(pthread_t) * shared.n_philo);
 
 	i = 0;
 	while(i < shared.n_philo)
@@ -106,7 +108,7 @@ int	main(int argc, char **argv)
 		init_data_philo(philo);
 		philo->id = i + 1;
 		philo->shared = &shared;
-		pthread_create(&philo->thread, NULL, &routine, philo);
+		pthread_create(&threads[i], NULL, &routine, philo);
 		pthread_detach(philo->thread); ///////////////////
 		if (i == 0)
 			first_philo = philo;
@@ -118,13 +120,6 @@ int	main(int argc, char **argv)
 
 	pthread_join(check_thread, NULL);
 	i = 0;
-	while(i < shared.n_philo)
-	{
-		pthread_join(philo->thread, NULL);
-		philo = philo->next;
-		i++;
-	}
-	if(philo->sim_stop == 1)
-		free_data(philo);
+	free(threads);
 	return (0);
 }

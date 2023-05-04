@@ -25,6 +25,7 @@ void take_forks(t_philo *philo)
 		pthread_mutex_unlock(&philo->write);
 
 		pthread_mutex_lock(&philo->next->fork);
+		
 		pthread_mutex_lock(&philo->write);
 		printf("%lld %d has taken a fork\n", get_time(), philo->id);
 		pthread_mutex_unlock(&philo->write);
@@ -38,6 +39,7 @@ void take_forks(t_philo *philo)
 		pthread_mutex_unlock(&philo->write);
 
 		pthread_mutex_lock(&philo->fork);
+
 		pthread_mutex_lock(&philo->write);
 		printf("%lld %d has taken a fork\n", get_time(), philo->id);
 		pthread_mutex_unlock(&philo->write);
@@ -62,6 +64,8 @@ void	eat(t_philo *philo)
 	philo->shared->meals_eaten++;
 	pthread_mutex_unlock(&philo->meals);
 
+	pthread_mutex_unlock(&philo->next->fork);
+	pthread_mutex_unlock(&philo->fork);
 }
 
 void	sleep_and_think(t_philo *philo)
@@ -69,9 +73,6 @@ void	sleep_and_think(t_philo *philo)
 	pthread_mutex_lock(&philo->write);
 	printf("%lld %d is sleeping\n", get_time(), philo->id);
 	pthread_mutex_unlock(&philo->write);
-
-	pthread_mutex_unlock(&philo->next->fork);
-	pthread_mutex_unlock(&philo->fork);
 
 	usleep(philo->shared->time_to_sleep * 1000);
 

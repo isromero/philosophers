@@ -63,3 +63,15 @@ int	ft_atoi(const char *str)
 		return (-1);
 	return (res * n);
 }
+
+void	log_message(t_philo *philo, t_event event)
+{
+	const char	*events[6] = {DEAD_STR, EAT_STR, THINK_STR,
+		SLEEP_STR, TAKE_FORK_STR};
+
+	if (philo->args->stop_sim)
+		return ;
+	pthread_mutex_lock(&philo->args->lock_print);
+	printf("%lld %d %s", get_time(), philo->id, events[event]);
+	pthread_mutex_unlock(&philo->args->lock_print);
+}

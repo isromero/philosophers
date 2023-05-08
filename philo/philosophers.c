@@ -14,64 +14,49 @@
 
 void	*check_philosophers(void *args)
 {
-	t_philo 	*philo;
-	int i;
+	t_philo	*philo;
 
 	philo = (t_philo *)args;
-	i = 0;
-
-	while(1)
+	while (!philo->args->stop_sim)
 	{
-        if (get_time() - philo->last_meal_time >= philo->time_to_die)
+        if ((get_time() - philo->last_meal_time) >= philo->args->time_to_die)
         {
-            pthread_mutex_lock(&philo->args.lock_print);
-            printf("%lld %d died\n", get_time(), philo->id);
-			pthread_mutex_unlock(&philo->args.lock_print);
-			while (i < philo[i].n_philos)
-			{
-				philo[i].stop = 1;
-				i++;
-			}
-			pthread_join(philo->check, NULL);
-			return (0);
+			log_message(philo, DEAD);
+			philo->args->stop_sim = true;
+			return (NULL);
         }
     }
-	return (0);
+	return (NULL);
 }
 
 void	*routine(void *args)
 {
 	t_philo 	*philo;
-	philo = (t_philo *)args;
 
+	philo = (t_philo *)args;
 	pthread_create(&philo->check, NULL, check_philosophers, philo);
-	while(philo->stop == 0)
+	while (!philo->args->stop_sim)
 	{
-		if (philo->n_philos == 1)
+		if (philo->args->n_philos == 1)
 		{
 			pthread_mutex_lock(philo->left_fork);
-			pthread_mutex_lock(&philo->args.lock_print);
-			printf("%lld %d has taken a fork\n", get_time(), philo->id);
-			pthread_mutex_unlock(&philo->args.lock_print);
-			pthread_join(philo->check, NULL);
-			return(0);
+			log_message(philo, FORK);
+			return (NULL);
 		}
 		take_forks(philo);
 		eat(philo);
 		sleep_and_think(philo);
 	}
-	return(0);
+	return (NULL);
 }
 
 int	main(int argc, char **argv)
 {
 	t_args 		args;
 
-	if(!parse_args(argc, argv, &args))
-		return (1);
-
+	if (parse_args(argc, argv, &args) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	init_forks(&args);
 	init_philos(&args);
-
-	return (0);
+	return (EXIT_SUCCESS);
 }

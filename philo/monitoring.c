@@ -12,6 +12,9 @@
 
 #include "philosophers.h"
 
+/* The check_death function continuously checks if a philosopher has exceeded the time limit for not eating. 
+If the philosopher has not eaten for too long, the function logs their death, stops the simulation, and exits 
+the thread. */
 void	*check_death(void *args)
 {
 	t_philo	*philo;
@@ -33,6 +36,10 @@ void	*check_death(void *args)
 	return (NULL);
 }
 
+/* This function checks if all the meals have been eaten by the philosophers. It does this by continuously checking 
+if the number of meals eaten by all the philosophers is greater than or equal to the total number of meals that were 
+supposed to be eaten. If this condition is met, the function stops the simulation and returns NULL. It also uses mutex 
+locks to ensure thread safety while accessing shared variables. */
 void	*check_meals(void *args)
 {
 	t_philo	*philo;

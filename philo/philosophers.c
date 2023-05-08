@@ -19,19 +19,20 @@ void	*check_philosophers(void *args)
 
 	philo = (t_philo *)args;
 	i = 0;
-	while(philo->stop == 0)
+
+	while(1)
 	{
         if (get_time() - philo->last_meal_time >= philo->time_to_die)
         {
             pthread_mutex_lock(&philo->args.lock_print);
             printf("%lld %d died\n", get_time(), philo->id);
-            pthread_mutex_unlock(&philo->args.lock_print);
-			
+			pthread_mutex_unlock(&philo->args.lock_print);
 			while (i < philo[i].n_philos)
 			{
 				philo[i].stop = 1;
 				i++;
 			}
+			pthread_join(philo->check, NULL);
 			return (0);
         }
     }
@@ -42,9 +43,8 @@ void	*routine(void *args)
 {
 	t_philo 	*philo;
 	philo = (t_philo *)args;
-	pthread_t			check;
 
-	pthread_create(&check, NULL, check_philosophers, philo);
+	pthread_create(&philo->check, NULL, check_philosophers, philo);
 	while(philo->stop == 0)
 	{
 		if (philo->n_philos == 1)
@@ -53,14 +53,13 @@ void	*routine(void *args)
 			pthread_mutex_lock(&philo->args.lock_print);
 			printf("%lld %d has taken a fork\n", get_time(), philo->id);
 			pthread_mutex_unlock(&philo->args.lock_print);
-			pthread_join(check, NULL);
+			pthread_join(philo->check, NULL);
 			return(0);
 		}
 		take_forks(philo);
 		eat(philo);
 		sleep_and_think(philo);
 	}
-	pthread_join(check, NULL);
 	return(0);
 }
 

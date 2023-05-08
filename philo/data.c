@@ -56,14 +56,13 @@ void	init_forks(t_args *args)
 void	init_philos(t_args *args)
 {
 	t_philo		*philo;
-	pthread_t	*threads;
 	int			i;
 
 	philo = malloc(sizeof(t_philo) * args->n_philos);
-	threads = malloc(sizeof(t_philo) * args->n_philos);
+	philo->threads = malloc(sizeof(t_philo) * args->n_philos);
 	i = 0;
 	
-	while(i < args->n_philos && philo->stop == 0)
+	while(i < args->n_philos)
 	{
 		philo[i].id = i + 1;
 		philo[i].last_meal_time = 0;
@@ -75,19 +74,23 @@ void	init_philos(t_args *args)
 		philo[i].time_to_sleep = args->time_to_sleep;
 		philo[i].left_fork = &args->forks[i];
 		philo[i].right_fork = &args->forks[(i + 1) % args->n_philos];
-		pthread_create(&threads[i], NULL, routine, &philo[i]);
+		pthread_create(&philo->threads[i], NULL, routine, &philo[i]);
 		i++;
 	}
+	pthread_join(philo->check, NULL);
 	i = 0;
 	while(i < philo->n_philos)
 	{
-		pthread_join(threads[i], NULL);
+		pthread_join(philo->threads[i], NULL);
 		i++;
 	}
-	pthread_mutex_destroy(args->forks);
-	free(threads);
+	i = 0;
+	while(i < args->n_philos)
+	{
+		pthread_mutex_destroy(&args->forks[i]);
+		i++;
+	}
+	free(philo->threads);
 	free(philo);
 	free(args->forks);
 }
-
-//problema con mandar la señal de muerte, los returns no hacen que termine el programa porque no se le indica bien

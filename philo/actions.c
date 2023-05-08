@@ -50,6 +50,7 @@ void	eat(t_philo *philo)
 	pthread_mutex_unlock(&philo->args.lock_print);
 
 	usleep(philo->time_to_eat * 1000);
+
 	pthread_mutex_unlock(philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
 }

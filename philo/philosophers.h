@@ -43,6 +43,8 @@ typedef struct	s_philo
 	long long			last_meal_time;
 	int					is_eating;
 	int					stop;
+	pthread_t			*threads;
+	pthread_t			check;
 
 	long long			time_to_die;
 	long long			time_to_eat;
@@ -50,7 +52,6 @@ typedef struct	s_philo
 
 	pthread_mutex_t		*left_fork;
 	pthread_mutex_t		*right_fork;
-	pthread_t			check;
 	t_args				args;
 
 }	t_philo;

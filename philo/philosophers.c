@@ -60,6 +60,7 @@ void	*routine(void *args)
 		eat(philo);
 		sleep_and_think(philo);
 	}
+	pthread_join(philo->check, NULL);
 	return(0);
 }
 

@@ -39,7 +39,6 @@ void	take_forks(t_philo *philo)
 		pthread_mutex_unlock(&philo->args.lock_print);
 	}
 }
-		
 	
 void	eat(t_philo *philo)
 {

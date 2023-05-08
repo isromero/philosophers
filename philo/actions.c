@@ -14,57 +14,44 @@
 
 void	take_forks(t_philo *philo)
 {
-	if(philo->id % 2 == 1)
+	if (philo->id % 2 == 1)
 	{
 		pthread_mutex_lock(philo->left_fork);
-		pthread_mutex_lock(&philo->args.lock_print);
-		printf("%lld %d has taken a fork\n", get_time(), philo->id);
-		pthread_mutex_unlock(&philo->args.lock_print);
+		log_message(philo, FORK);
 
 		pthread_mutex_lock(philo->right_fork);
-		pthread_mutex_lock(&philo->args.lock_print);
-		printf("%lld %d has taken a fork\n", get_time(), philo->id);
-		pthread_mutex_unlock(&philo->args.lock_print);
+		log_message(philo, FORK);
 	}
-	if(philo->id % 2 == 0)
+	if (philo->id % 2 == 0)
 	{
 		pthread_mutex_lock(philo->right_fork);
-		pthread_mutex_lock(&philo->args.lock_print);
-		printf("%lld %d has taken a fork\n", get_time(), philo->id);
-		pthread_mutex_unlock(&philo->args.lock_print);
+		log_message(philo, FORK);
 
 		pthread_mutex_lock(philo->left_fork);
-		pthread_mutex_lock(&philo->args.lock_print);
-		printf("%lld %d has taken a fork\n", get_time(), philo->id);
-		pthread_mutex_unlock(&philo->args.lock_print);
+		log_message(philo, FORK);
 	}
 }
-	
+
 void	eat(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->args->lock_last_meal_time);
 	philo->last_meal_time = get_time();
-	
-	pthread_mutex_lock(&philo->args.lock_print);
-	printf("%lld %d is eating\n", get_time(), philo->id);
-	pthread_mutex_unlock(&philo->args.lock_print);
+	pthread_mutex_unlock(&philo->args->lock_last_meal_time);
 
-	usleep(philo->time_to_eat * 1000);
+	log_message(philo, EAT);
+	usleep(philo->args->time_to_eat * 1000);
 
 	pthread_mutex_unlock(philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
+
+	pthread_mutex_lock(&philo->args->lock_meals_eaten);
+	philo->args->meals_eaten++;
+	pthread_mutex_unlock(&philo->args->lock_meals_eaten);
 }
 
 void	sleep_and_think(t_philo *philo)
 {
-
-	pthread_mutex_lock(&philo->args.lock_print);
-	printf("%lld %d is sleeping\n", get_time(), philo->id);
-	pthread_mutex_unlock(&philo->args.lock_print);
-
-	usleep(philo->time_to_sleep * 1000);
-
-	pthread_mutex_lock(&philo->args.lock_print);
-	printf("%lld %d is sleeping\n", get_time(), philo->id);
-	pthread_mutex_unlock(&philo->args.lock_print);
-	
+	log_message(philo, SLEEP);
+	usleep(philo->args->time_to_sleep * 1000);
+	log_message(philo, THINK);
 }

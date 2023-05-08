@@ -34,31 +34,45 @@ typedef struct	s_args
 	pthread_mutex_t		*forks;
 	pthread_mutex_t		lock_print;
 	pthread_mutex_t		lock_death;
+	pthread_mutex_t		lock_meals_stop;
+	pthread_mutex_t		lock_meals_eaten;
+	pthread_mutex_t		lock_last_meal_time;
+
+	bool				stop_sim;
 }	t_args;
 
 typedef struct	s_philo
 {
 	int					id;
-	int					n_philos;
 	long long			last_meal_time;
-	int					is_eating;
-	int					stop;
 	pthread_t			*threads;
-	pthread_t			check;
-
-	long long			time_to_die;
-	long long			time_to_eat;
-	long long			time_to_sleep;
+	pthread_t			death_check;
+	pthread_t			meals_check;
 
 	pthread_mutex_t		*left_fork;
 	pthread_mutex_t		*right_fork;
-	t_args				args;
-
+	t_args				*args;
 }	t_philo;
+
+typedef enum e_state {
+	DEAD,
+	EAT,
+	THINK,
+	SLEEP,
+	FORK,
+	DROP,
+}	t_state;
+
+#define TAKE_FORK_STR "has taken a fork\n"
+#define EAT_STR "is eating\n"
+#define THINK_STR "is thinking\n"
+#define SLEEP_STR "is sleeping\n"
+#define DEAD_STR "is dead\n"
 
 /* philosophers.c */
 void	*routine(void *args);
-void	*check_philosophers(void *args);
+void	*check_death(void *args);
+void	*check_meals(void *args);
 
 /* actions.c */
 void	take_forks(t_philo *philo);
@@ -68,11 +82,11 @@ void	sleep_and_think(t_philo *philo);
 /* utils */
 long long	get_time(void);
 int			ft_atoi(const char *str);
+void		log_message(t_philo *philo, t_state state);
 
 /* data	*/
 int		parse_args(int argc, char **argv, t_args *args);
 void	init_philos(t_args *args);
 void	init_forks(t_args *args);
-void	join_threads(t_args *args, t_philo *philo);
 
 #endif

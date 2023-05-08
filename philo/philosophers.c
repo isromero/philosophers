@@ -12,50 +12,9 @@
 
 #include "philosophers.h"
 
-#include "philosophers.h"
-
-void	*check_death(void *args)
-{
-	t_philo	*philo;
-
-	philo = (t_philo *)args;
-	while (!philo->args->stop_sim)
-	{
-        if ((get_time() - philo->last_meal_time) >= philo->args->time_to_die)
-        {
-			pthread_join(philo->death_check, NULL);
-			pthread_mutex_lock(&philo->args->lock_death);
-			log_message(philo, DEAD);
-			philo->args->stop_sim = true;
-			pthread_mutex_unlock(&philo->args->lock_death);
-			return (NULL);
-        }
-    }
-	return (NULL);
-}
-
-void	*check_meals(void *args)
-{
-	t_philo	*philo;
-
-	philo = (t_philo *)args;
-	while (!philo->args->stop_sim)
-	{
-		if(philo->args->n_meals > 0 && (philo->args->meals_eaten >= (philo->args->n_meals * philo->args->n_philos)))
-		{
-			pthread_join(philo->meals_check, NULL);
-			pthread_mutex_lock(&philo->args->lock_meals_stop);
-			philo->args->stop_sim = true;
-			pthread_mutex_unlock(&philo->args->lock_meals_stop);
-			return (NULL);
-		}	
-    }
-	return (NULL);
-}
-
 void	*routine(void *args)
 {
-	t_philo 	*philo;
+	t_philo	*philo;
 
 	philo = (t_philo *)args;
 	pthread_create(&philo->death_check, NULL, check_death, philo);
@@ -77,11 +36,17 @@ void	*routine(void *args)
 
 int	main(int argc, char **argv)
 {
-	t_args 		args;
+	t_args	args;
+	t_philo	*philos;
 
 	if (parse_args(argc, argv, &args) == EXIT_FAILURE)
 		return (EXIT_FAILURE);
+	philos = malloc(sizeof(t_philo) * args.n_philos);
+	if (!philos)
+		return (EXIT_FAILURE);
 	init_forks(&args);
-	init_philos(&args);
+	init_philos_and_mutexes(philos, &args);
+	join_philos(philos);
+	free_and_destroy(philos, &args);
 	return (EXIT_SUCCESS);
 }

@@ -12,7 +12,7 @@
 
 NAME		=	philo
 CC			=	gcc
-SRCS		=	philosophers.c actions.c data.c utils.c 
+SRCS		=	philosophers.c data.c actions.c monitoring.c utils.c 
 
 CFLAGS		=	-Wall -Werror -Wextra -pthread #-fsanitize=thread#
 RM			=	rm -f

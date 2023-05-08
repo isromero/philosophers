@@ -12,27 +12,14 @@
 
 #include "philosophers.h"
 
-#include "philosophers.h"
-
 int	parse_args(int argc, char **argv, t_args *args)
 {
-	if (argc < 5)
-	{
-		printf("Invalid arguments\n");
-		return (EXIT_FAILURE);
-	}
 	args->n_philos = ft_atoi(argv[1]);
 	args->time_to_die = ft_atoi(argv[2]);
 	args->time_to_eat = ft_atoi(argv[3]);
 	args->time_to_sleep = ft_atoi(argv[4]);
 	args->stop_sim = false;
 	args->meals_eaten = 0;
-	pthread_mutex_init(&args->lock_print, NULL);
-	pthread_mutex_init(&args->lock_death, NULL);
-	pthread_mutex_init(&args->lock_meals_stop, NULL);
-	pthread_mutex_init(&args->lock_meals_eaten, NULL);
-	pthread_mutex_init(&args->lock_last_meal_time, NULL);
-	
 	if (argc == 6)
 	{
 		args->n_meals = ft_atoi(argv[5]);
@@ -42,14 +29,12 @@ int	parse_args(int argc, char **argv, t_args *args)
 			return (EXIT_FAILURE);
 		}
 	}
-	if (args->n_philos <= 0 || args->time_to_die <= 0 
-  	|| args->time_to_eat <= 0 || args->time_to_sleep <= 0)
+	if (argc < 5 || args->n_philos <= 0 || args->time_to_die <= 0 \
+	|| args->time_to_eat <= 0 || args->time_to_sleep <= 0)
 	{
 		printf("Invalid arguments\n");
 		return (EXIT_FAILURE);
 	}
-	
-	
 	return (EXIT_SUCCESS);
 }
 
@@ -59,19 +44,22 @@ void	init_forks(t_args *args)
 
 	args->forks = malloc(sizeof(t_args) * args->n_philos);
 	i = 0;
-	while (i < args->n_philos) 
+	while (i < args->n_philos)
 	{
-    	pthread_mutex_init(&args->forks[i], NULL);
+		pthread_mutex_init(&args->forks[i], NULL);
 		i++;
 	}
 }
 
-void	init_philos(t_args *args)
+void	init_philos_and_mutexes(t_philo *philos, t_args *args)
 {
-	t_philo		*philos;
-	int			i;
+	int	i;
 
-	philos = malloc(sizeof(t_philo) * args->n_philos);
+	pthread_mutex_init(&args->lock_print, NULL);
+	pthread_mutex_init(&args->lock_death, NULL);
+	pthread_mutex_init(&args->lock_meals_stop, NULL);
+	pthread_mutex_init(&args->lock_meals_eaten, NULL);
+	pthread_mutex_init(&args->lock_last_meal_time, NULL);
 	philos->threads = malloc(sizeof(pthread_t) * args->n_philos);
 	i = 0;
 	while (i < args->n_philos)
@@ -84,6 +72,12 @@ void	init_philos(t_args *args)
 		pthread_create(&philos->threads[i], NULL, routine, &philos[i]);
 		i++;
 	}
+}
+
+void	join_philos(t_philo *philos)
+{
+	int	i;
+
 	i = 0;
 	while (i < philos->args->n_philos)
 	{
@@ -92,11 +86,16 @@ void	init_philos(t_args *args)
 		pthread_join(philos[i].meals_check, NULL);
 		i++;
 	}
+}
+
+void	free_and_destroy(t_philo *philos, t_args *args)
+{
+	int	i;
 
 	i = 0;
 	while (i < philos->args->n_philos)
 	{
- 		pthread_mutex_destroy(&args->forks[i]);
+		pthread_mutex_destroy(&args->forks[i]);
 		i++;
 	}
 	pthread_mutex_destroy(&args->lock_print);
@@ -108,4 +107,3 @@ void	init_philos(t_args *args)
 	free(philos);
 	free(args->forks);
 }
-

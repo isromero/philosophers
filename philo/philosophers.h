@@ -11,17 +11,17 @@
 /* ************************************************************************** */
 
 #ifndef PHILOSOPHERS_H
-#define PHILOSOPHERS_H
+# define PHILOSOPHERS_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <pthread.h>
-#include <stdbool.h>
-#include <sys/time.h>
-#include <string.h>
+# include <stdlib.h>
+# include <stdio.h>
+# include <unistd.h>
+# include <pthread.h>
+# include <stdbool.h>
+# include <sys/time.h>
+# include <string.h>
 
-typedef struct	s_args
+typedef struct s_args
 {
 	int					n_philos;
 	int					n_meals;
@@ -41,7 +41,7 @@ typedef struct	s_args
 	bool				stop_sim;
 }	t_args;
 
-typedef struct	s_philo
+typedef struct s_philo
 {
 	int					id;
 	long long			last_meal_time;
@@ -63,30 +63,34 @@ typedef enum e_state {
 	DROP,
 }	t_state;
 
-#define TAKE_FORK_STR "has taken a fork\n"
-#define EAT_STR "is eating\n"
-#define THINK_STR "is thinking\n"
-#define SLEEP_STR "is sleeping\n"
-#define DEAD_STR "is dead\n"
+# define TAKE_FORK_STR "has taken a fork\n"
+# define EAT_STR "is eating\n"
+# define THINK_STR "is thinking\n"
+# define SLEEP_STR "is sleeping\n"
+# define DEAD_STR "is dead\n"
 
 /* philosophers.c */
-void	*routine(void *args);
-void	*check_death(void *args);
-void	*check_meals(void *args);
-
-/* actions.c */
-void	take_forks(t_philo *philo);
-void	eat(t_philo *philo);
-void	sleep_and_think(t_philo *philo);
-
-/* utils */
-long long	get_time(void);
-int			ft_atoi(const char *str);
-void		log_message(t_philo *philo, t_state state);
+void			*routine(void *args);
 
 /* data	*/
-int		parse_args(int argc, char **argv, t_args *args);
-void	init_philos(t_args *args);
-void	init_forks(t_args *args);
+int				parse_args(int argc, char **argv, t_args *args);
+void			init_forks(t_args *args);
+void			init_philos_and_mutexes(t_philo *philos, t_args *args);
+void			join_philos(t_philo *philos);
+void			free_and_destroy(t_philo *philos, t_args *args);
+
+/* actions.c */
+void			take_forks(t_philo *philo);
+void			eat(t_philo *philo);
+void			sleep_and_think(t_philo *philo);
+
+/* monitoring.c */
+void			*check_death(void *args);
+void			*check_meals(void *args);
+
+/* utils */
+long long		get_time(void);
+int				ft_atoi(const char *str);
+void			log_message(t_philo *philo, t_state state);
 
 #endif

@@ -23,10 +23,11 @@ void	take_forks(t_philo *philo)
 	if (philo->id % 2 == 1)
 	{
 		pthread_mutex_lock(philo->left_fork);
+		log_message(philo, FORK);
 		pthread_mutex_lock(philo->right_fork);
 		log_message(philo, FORK);
 	}
-	if (philo->id % 2 == 0)
+	else if (philo->id % 2 == 0)
 	{
 		pthread_mutex_lock(philo->right_fork);
 		log_message(philo, FORK);
@@ -41,11 +42,13 @@ is locked, always before you start eating. It makes usleep for the set amount of
 Once this is done, the variable of the times eaten is updated. */
 void	eat(t_philo *philo)
 {
-	pthread_mutex_lock(&philo->args->lock_last_meal_time);
+	long long int	end_time;
+
 	philo->last_meal_time = get_time();
-	pthread_mutex_unlock(&philo->args->lock_last_meal_time);
 	log_message(philo, EAT);
-	usleep(philo->args->time_to_eat * 1000);
+	end_time = get_time() + philo->args->time_to_eat;
+	while (get_time() < end_time)
+		usleep(50);
 	pthread_mutex_unlock(philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
 	pthread_mutex_lock(&philo->args->lock_meals_eaten);
@@ -57,7 +60,12 @@ void	eat(t_philo *philo)
 specified time_to_sleep */
 void	sleep_and_think(t_philo *philo)
 {
+	long long int	end_time;
+
+	end_time = get_time() + philo->args->time_to_sleep;
 	log_message(philo, SLEEP);
-	usleep(philo->args->time_to_sleep * 1000);
+
+	while (get_time() < end_time)
+		usleep(50);
 	log_message(philo, THINK);
 }

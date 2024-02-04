@@ -22,7 +22,7 @@ void	*check_death(void *args)
 	philo = (t_philo *)args;
 	while (!philo->args->stop_sim)
 	{
-		if ((get_time() - philo->last_meal_time) >= philo->args->time_to_die)
+		if ((get_time() - philo->last_meal_time) > philo->args->time_to_die)
 		{
 			pthread_join(philo->death_check, NULL);
 			pthread_mutex_lock(&philo->args->lock_death);
@@ -31,7 +31,7 @@ void	*check_death(void *args)
 			pthread_mutex_unlock(&philo->args->lock_death);
 			return (NULL);
 		}
-		usleep(50);
+		usleep(1000);
 	}
 	return (NULL);
 }
@@ -56,7 +56,7 @@ void	*check_meals(void *args)
 			pthread_mutex_unlock(&philo->args->lock_meals_stop);
 			return (NULL);
 		}
-		usleep(50);
+		usleep(1000);
 	}
 	return (NULL);
 }

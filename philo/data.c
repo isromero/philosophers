@@ -22,6 +22,7 @@ int	parse_args(int argc, char **argv, t_args *args)
 	args->time_to_eat = ft_atoi(argv[3]);
 	args->time_to_sleep = ft_atoi(argv[4]);
 	args->stop_sim = false;
+	args->n_meals = 0;
 	args->meals_eaten = 0;
 	if (argc == 6)
 	{
@@ -40,7 +41,6 @@ int	parse_args(int argc, char **argv, t_args *args)
 	}
 	return (EXIT_SUCCESS);
 }
-
 
 /* The init_forks function initializes the mutex locks for the forks used by the philosophers in the simulation. 
 It takes a t_args structure pointer as input, which contains the number of philosophers in the simulation. 

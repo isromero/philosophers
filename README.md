@@ -4,7 +4,7 @@
 ## About
 This project is a version of the [Dining Philosophers Problem](https://en.wikipedia.org/wiki/Dining_philosophers_problem).
 
-![The Dining Philosophers](https://en.wikipedia.org/wiki/Dining_philosophers_problem#/media/File:An_illustration_of_the_dining_philosophers_problem.png)
+![The Dining Philosophers](https://upload.wikimedia.org/wikipedia/commons/7/7b/An_illustration_of_the_dining_philosophers_problem.png)
 
 
 The goal of this project was to learn to avoid deadlock and race conditions when creating multithreaded applications.

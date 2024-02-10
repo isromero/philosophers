@@ -33,7 +33,7 @@ int	parse_args(int argc, char **argv, t_args *args)
 			return (EXIT_FAILURE);
 		}
 	}
-	if (argc < 5 || args->n_philos <= 0 || args->time_to_die <= 0 \
+	if (argc < 5 || argc > 6 || args->n_philos <= 0 || args->time_to_die <= 0 \
 	|| args->time_to_eat <= 0 || args->time_to_sleep <= 0)
 	{
 		printf("Invalid arguments\n");

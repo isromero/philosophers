@@ -35,8 +35,8 @@ void	*check_death(void *args)
 			log_message(philo, DEAD);
 			pthread_mutex_lock(&philo->args->lock_stop_sim);
 			philo->args->stop_sim = true;
-			pthread_mutex_unlock(&philo->args->lock_stop_sim);
 			pthread_mutex_unlock(&philo->args->lock_death);
+			pthread_mutex_unlock(&philo->args->lock_stop_sim);
 			return (NULL);
 		}
 		usleep(1000);
@@ -70,8 +70,8 @@ void	*check_meals(void *args)
 			pthread_mutex_lock(&philo->args->lock_meals_stop);
 			pthread_mutex_lock(&philo->args->lock_stop_sim);
 			philo->args->stop_sim = true;
-			pthread_mutex_unlock(&philo->args->lock_stop_sim);
 			pthread_mutex_unlock(&philo->args->lock_meals_stop);
+			pthread_mutex_unlock(&philo->args->lock_stop_sim);
 			return (NULL);
 		}
 		pthread_mutex_unlock(&philo->args->lock_meals_eaten);

@@ -78,8 +78,13 @@ void	log_message(t_philo *philo, t_state state)
 	const char	*states[6] = {DEAD_STR, EAT_STR, THINK_STR,
 		SLEEP_STR, TAKE_FORK_STR};
 
+	pthread_mutex_lock(&philo->args->lock_stop_sim);
 	if (philo->args->stop_sim)
+	{
+		pthread_mutex_unlock(&philo->args->lock_stop_sim);
 		return ;
+	}
+	pthread_mutex_unlock(&philo->args->lock_stop_sim);
 	pthread_mutex_lock(&philo->args->lock_print);
 	printf("%lld %d %s", get_time(), philo->id, states[state]);
 	pthread_mutex_unlock(&philo->args->lock_print);

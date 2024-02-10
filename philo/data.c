@@ -71,16 +71,23 @@ void	init_philos_and_mutexes(t_philo *philos, t_args *args)
 	pthread_mutex_init(&args->lock_meals_stop, NULL);
 	pthread_mutex_init(&args->lock_meals_eaten, NULL);
 	pthread_mutex_init(&args->lock_last_meal_time, NULL);
-	philos->threads = malloc(sizeof(pthread_t) * args->n_philos);
+	pthread_mutex_init(&args->lock_stop_sim, NULL);
 	i = 0;
 	while (i < args->n_philos)
 	{
 		philos[i].id = i + 1;
 		philos[i].last_meal_time = get_time();
+		philos[i].n_philos = args->n_philos;
+		philos[i].n_meals = args->n_meals;
+		philos[i].time_to_die = args->time_to_die;
+		philos[i].time_to_eat = args->time_to_eat;
+		philos[i].time_to_sleep = args->time_to_sleep;
 		philos[i].left_fork = &args->forks[i];
 		philos[i].right_fork = &args->forks[(i + 1) % args->n_philos];
 		philos[i].args = args;
-		pthread_create(&philos->threads[i], NULL, routine, &philos[i]);
+		pthread_create(&philos[i].thread, NULL, routine, &philos[i]);
+		pthread_create(&philos[i].death_check, NULL, check_death, &philos[i]);
+		pthread_create(&philos[i].meals_check, NULL, check_meals, &philos[i]);
 		i++;
 	}
 }
@@ -95,7 +102,7 @@ void	join_philos(t_philo *philos)
 	i = 0;
 	while (i < philos->args->n_philos)
 	{
-		pthread_join(philos->threads[i], NULL);
+		pthread_join(philos[i].thread, NULL);
 		pthread_join(philos[i].death_check, NULL);
 		pthread_join(philos[i].meals_check, NULL);
 		i++;
@@ -118,7 +125,7 @@ void	free_and_destroy(t_philo *philos, t_args *args)
 	pthread_mutex_destroy(&args->lock_last_meal_time);
 	pthread_mutex_destroy(&args->lock_meals_eaten);
 	pthread_mutex_destroy(&args->lock_meals_stop);
-	free(philos->threads);
+	pthread_mutex_destroy(&args->lock_stop_sim);
 	free(philos);
 	free(args->forks);
 }

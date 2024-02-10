@@ -22,16 +22,22 @@ void	*routine(void *args)
 	t_philo	*philo;
 
 	philo = (t_philo *)args;
-	pthread_create(&philo->death_check, NULL, check_death, philo);
-	pthread_create(&philo->meals_check, NULL, check_meals, philo);
 	if (philo->id % 2 == 0)
 		usleep(500);
-	while (!philo->args->stop_sim)
+	while (1)
 	{
-		if (philo->args->n_philos == 1)
+		pthread_mutex_lock(&philo->args->lock_stop_sim);
+		if (philo->args->stop_sim)
+		{
+			pthread_mutex_unlock(&philo->args->lock_stop_sim);
+			return (NULL);
+		}
+		pthread_mutex_unlock(&philo->args->lock_stop_sim);
+		if (philo->n_philos == 1)
 		{
 			pthread_mutex_lock(philo->left_fork);
 			log_message(philo, FORK);
+			pthread_mutex_unlock(philo->left_fork);
 			return (NULL);
 		}
 		take_forks(philo);

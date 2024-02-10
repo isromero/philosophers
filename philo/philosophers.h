@@ -23,13 +23,14 @@
 
 typedef struct s_args
 {
+	int					meals_eaten;
 	int					n_philos;
 	int					n_meals;
-	int					meals_eaten;
-
 	long long			time_to_die;
 	long long			time_to_eat;
 	long long			time_to_sleep;
+
+	bool				stop_sim;
 
 	pthread_mutex_t		*forks;
 	pthread_mutex_t		lock_print;
@@ -37,15 +38,21 @@ typedef struct s_args
 	pthread_mutex_t		lock_meals_stop;
 	pthread_mutex_t		lock_meals_eaten;
 	pthread_mutex_t		lock_last_meal_time;
-
-	bool				stop_sim;
+	pthread_mutex_t		lock_stop_sim;
 }	t_args;
 
 typedef struct s_philo
 {
 	int					id;
 	long long			last_meal_time;
-	pthread_t			*threads;
+	int					n_philos;
+	int					n_meals;
+	long long			time_to_die;
+	long long			time_to_eat;
+	long long			time_to_sleep;
+
+	pthread_t			thread;
+
 	pthread_t			death_check;
 	pthread_t			meals_check;
 

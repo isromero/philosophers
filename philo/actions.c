@@ -50,7 +50,7 @@ void	eat(t_philo *philo)
 	log_message(philo, EAT);
 	end_time = get_time() + philo->time_to_eat;
 	while (get_time() < end_time)
-		usleep(50);
+		usleep(200);
 	pthread_mutex_unlock(philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
 	pthread_mutex_lock(&philo->args->lock_meals_eaten);
@@ -68,6 +68,6 @@ void	sleep_and_think(t_philo *philo)
 	log_message(philo, SLEEP);
 
 	while (get_time() < end_time)
-		usleep(50);
+		usleep(200);
 	log_message(philo, THINK);
 }

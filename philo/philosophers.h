@@ -38,6 +38,7 @@ typedef struct s_args
 	pthread_mutex_t		lock_meals_stop;
 	pthread_mutex_t		lock_meals_eaten;
 	pthread_mutex_t		lock_stop_sim;
+	pthread_mutex_t		lock_last_meal_time;
 }	t_args;
 
 typedef struct s_philo

@@ -44,7 +44,9 @@ void	eat(t_philo *philo)
 {
 	long long int	end_time;
 
+	pthread_mutex_lock(&philo->args->lock_last_meal_time);
 	philo->last_meal_time = get_time();
+	pthread_mutex_unlock(&philo->args->lock_last_meal_time);
 	log_message(philo, EAT);
 	end_time = get_time() + philo->time_to_eat;
 	while (get_time() < end_time)

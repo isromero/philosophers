@@ -71,6 +71,7 @@ void	init_philos_and_mutexes(t_philo *philos, t_args *args)
 	pthread_mutex_init(&args->lock_meals_stop, NULL);
 	pthread_mutex_init(&args->lock_meals_eaten, NULL);
 	pthread_mutex_init(&args->lock_stop_sim, NULL);
+	pthread_mutex_init(&args->lock_last_meal_time, NULL);
 	i = 0;
 	while (i < args->n_philos)
 	{
@@ -121,6 +122,7 @@ void	free_and_destroy(t_philo *philos, t_args *args)
 	}
 	pthread_mutex_destroy(&args->lock_print);
 	pthread_mutex_destroy(&args->lock_death);
+	pthread_mutex_destroy(&args->lock_last_meal_time);
 	pthread_mutex_destroy(&args->lock_meals_eaten);
 	pthread_mutex_destroy(&args->lock_meals_stop);
 	pthread_mutex_destroy(&args->lock_stop_sim);

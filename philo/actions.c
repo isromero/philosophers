@@ -27,7 +27,7 @@ void	take_forks(t_philo *philo)
 		pthread_mutex_lock(philo->right_fork);
 		log_message(philo, FORK);
 	}
-	else if (philo->id % 2 == 0)
+	else
 	{
 		pthread_mutex_lock(philo->right_fork);
 		log_message(philo, FORK);

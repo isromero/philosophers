@@ -22,7 +22,7 @@ void	*routine(void *args)
 	t_philo	*philo;
 
 	philo = (t_philo *)args;
-	if (philo->id % 2 == 0)
+	if (philo->id % 2 == 1)
 		usleep(500);
 	while (1)
 	{
@@ -52,17 +52,14 @@ int	main(int argc, char **argv)
 	t_args	args;
 	t_philo	*philos;
 
-	if (argc > 4)
-	{
-		if (parse_args(argc, argv, &args) == EXIT_FAILURE)
-			return (EXIT_FAILURE);
-		philos = malloc(sizeof(t_philo) * args.n_philos);
-		if (!philos)
-			return (EXIT_FAILURE);
-		init_forks(&args);
-		init_philos_and_mutexes(philos, &args);
-		join_philos(philos);
-		free_and_destroy(philos, &args);
-	}
+	if (parse_args(argc, argv, &args) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	philos = malloc(sizeof(t_philo) * args.n_philos);
+	if (!philos)
+		return (EXIT_FAILURE);
+	init_forks(&args);
+	init_philos_and_mutexes(philos, &args);
+	join_philos(philos);
+	free_and_destroy(philos, &args);
 	return (EXIT_SUCCESS);
 }

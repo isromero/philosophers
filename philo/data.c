@@ -17,10 +17,13 @@ a struct with them. It also performs some basic error-checking on the input valu
 exit status. */
 int	parse_args(int argc, char **argv, t_args *args)
 {
-	args->n_philos = ft_atoi(argv[1]);
-	args->time_to_die = ft_atoi(argv[2]);
-	args->time_to_eat = ft_atoi(argv[3]);
-	args->time_to_sleep = ft_atoi(argv[4]);
+	if (argc > 4)
+	{
+		args->n_philos = ft_atoi(argv[1]);
+		args->time_to_die = ft_atoi(argv[2]);
+		args->time_to_eat = ft_atoi(argv[3]);
+		args->time_to_sleep = ft_atoi(argv[4]);
+	}
 	args->stop_sim = false;
 	args->n_meals = 0;
 	args->meals_eaten = 0;

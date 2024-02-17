@@ -43,6 +43,7 @@ void	*routine(void *args)
 		take_forks(philo);
 		eat(philo);
 		sleep_and_think(philo);
+		usleep(1000);
 	}
 	return (NULL);
 }

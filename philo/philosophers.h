@@ -61,7 +61,8 @@ typedef struct s_philo
 	t_args				*args;
 }	t_philo;
 
-typedef enum e_state {
+typedef enum e_state
+{
 	DEAD,
 	EAT,
 	THINK,
@@ -79,12 +80,16 @@ typedef enum e_state {
 /* philosophers.c */
 void			*routine(void *args);
 
-/* data	*/
+/* data.c	*/
 int				parse_args(int argc, char **argv, t_args *args);
 void			init_forks(t_args *args);
 void			init_philos_and_mutexes(t_philo *philos, t_args *args);
 void			join_philos(t_philo *philos);
 void			free_and_destroy(t_philo *philos, t_args *args);
+
+/* data_utils.c */
+void			init_mutexes(t_args *args);
+void			init_args(int argc, char **argv, t_args *args);
 
 /* actions.c */
 void			take_forks(t_philo *philo);

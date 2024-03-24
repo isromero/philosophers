@@ -12,18 +12,11 @@
 
 #include "philosophers.h"
 
-/* This function represents the main routine of each philosopher thread in the dining philosophers problem 
-simulation. It creates two threads, one to check for the philosopher's death, and the other to check for the 
-maximum number of meals eaten. It then enters a loop where the philosopher alternates between taking two 
-forks, eating, and sleeping/thinking. The loop continues until the simulation is stopped by the main thread. 
-If there is only one philosopher, the philosopher takes the fork and immediately returns. */
 void	*routine(void *args)
 {
 	t_philo	*philo;
 
 	philo = (t_philo *)args;
-	if (philo->id % 2 == 1)
-		usleep(500);
 	while (1)
 	{
 		pthread_mutex_lock(&philo->args->lock_stop_sim);
